@@ -1,0 +1,12 @@
+{
+    "extends": "@tsconfig/node12/tsconfig.json",
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "preserveConstEnums": true,
+        "outDir": "build",
+        "module": "commonjs"
+    },
+    "files": [
+        "./index.ts"
+    ]
+}
