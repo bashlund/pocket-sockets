@@ -1,6 +1,3 @@
-// TODO: FIXME: tests for _data: it is now socketData
-// TODO: FIXME: verify missing tests which have been initially removed due to code changes
-
 import { TestSuite, Test } from "testyts";
 import {AbstractClient} from "../index";
 
@@ -99,31 +96,6 @@ export class AbstractClientSend {
 
     @Test()
     public buffer_is_Buffer() {
-        let flag = false;
-        class TestClient extends AbstractClient {
-            socketSend(buffer: Buffer) {
-                flag = true;
-                assert(buffer.toString() == "testdata");
-            }
-            socketConnect() {
-            }
-            socketHook() {
-            }
-        }
-
-        assert.doesNotThrow(() => {
-            assert(flag == false);
-            const client = new TestClient({
-                "host": "host.com",
-                "port": 99,
-            });
-            client.send(Buffer.from("testdata"));
-            assert(flag == true);
-        });
-    }
-
-    @Test()
-    public buffer_is_string() {
         let flag = false;
         class TestClient extends AbstractClient {
             socketSend(buffer: Buffer) {
