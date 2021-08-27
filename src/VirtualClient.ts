@@ -73,7 +73,7 @@ class VirtualClient extends AbstractClient
      */
     protected socketDisconnect() {
         if (this.pairedSocket) {
-            this.pairedSocket.disconnect();
+            this.pairedSocket.socketDisconnected();
         }
         this.socketDisconnected();
     }
