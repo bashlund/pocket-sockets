@@ -196,9 +196,9 @@ export class AbstractClient
     /**
      * Base close event procedure responsible for triggering the close event.
      */
-    protected socketClosed = () => {
+    protected socketClosed = (hadError: boolean) => {
         this.isClosed = true;
-        this.triggerEvent("close");
+        this.triggerEvent("close", hadError);
     }
 
     /**
@@ -277,7 +277,7 @@ export class AbstractClient
      * @param {boolean} [doBuffer] - buffers up event data.
      *
      */
-    private triggerEvent(event: string, data?: Buffer, doBuffer = false) {
+    private triggerEvent(event: string, data?: any, doBuffer = false) {
         const tuple = (this.eventHandlers[event] || [[], []]);
         this.eventHandlers[event] = tuple;
         const [fns, queue] = tuple;

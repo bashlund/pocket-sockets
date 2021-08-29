@@ -114,7 +114,7 @@ export class WSClient extends AbstractClient
             this.socketData(data);
         };
         this.socket.onerror = this.error;               // Error connecting
-        this.socket.onclose = this.socketClosed;  // Socket closed
+        this.socket.onclose = (closeEvent) => this.socketClosed(closeEvent && closeEvent.code === 1000);         // Socket closed
     }
 
     /**

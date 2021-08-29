@@ -72,10 +72,11 @@ class VirtualClient extends AbstractClient
      * Specify the paired close procedure.
      */
     protected socketClose() {
+        const hadError = false;
         if (this.pairedSocket) {
-            this.pairedSocket.socketClosed();
+            this.pairedSocket.socketClosed(hadError);
         }
-        this.socketClosed();
+        this.socketClosed(hadError);
     }
 
     /**
