@@ -22,7 +22,7 @@ export class TCPClientSocketConnect {
 			assert(client.clientOptions!.rejectUnauthorized == null);
 
 			assert(client.socket == null);
-			assert(client.isDisconnected == false);
+			assert(client.isClosed == false);
 
 			//@ts-ignore: overwrite read-only
 			tls.connect = function() {
@@ -52,7 +52,7 @@ export class TCPClientSocketConnect {
 			assert(client.clientOptions!.rejectUnauthorized == null);
 
 			assert(client.socket == null);
-			assert(client.isDisconnected == false);
+			assert(client.isClosed == false);
 
 			//@ts-ignore: overwrite read-only
 			net.connect = function() {
@@ -123,7 +123,7 @@ export class TCPClientSocketSend {
 }
 
 @TestSuite()
-export class TCPClientSocketDisconnect {
+export class TCPClientSocketClose {
     @Test()
     public successful_call() {
 		assert.doesNotThrow(() => {
@@ -141,7 +141,7 @@ export class TCPClientSocketDisconnect {
 			};
 			assert(hasEnded == false);
 			//@ts-ignore: protected method
-			client.socketDisconnect();
+			client.socketClose();
 			//@ts-ignore
 			assert(hasEnded == true);
 		});

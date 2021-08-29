@@ -24,8 +24,8 @@ export class Connection {
                     assert(data.toString() == "hello");
                     client.sendString("received!");
                 });
-                client.onDisconnect( () => {
-                    console.log("client disconnected");
+                client.onClose( () => {
+                    console.log("client closed");
                     server.close();
                     resolve();
                 });
@@ -43,10 +43,10 @@ export class Connection {
                 client.onData( (data: Buffer) => {
                     console.log("Incoming data", data);
                     assert(data.toString() == "received!");
-                    client.disconnect();
+                    client.close();
                 });
-                client.onDisconnect( () => {
-                    console.log("client disconnected");
+                client.onClose( () => {
+                    console.log("client closed");
                 });
                 client.sendString("hello");
             });

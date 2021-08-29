@@ -108,7 +108,7 @@ export class TCPClient extends AbstractClient
 
         this.socket.on("data", this.socketData);            // Incoming data
         this.socket.on("error", this.error);                // Error connecting
-        this.socket.on("close", this.socketDisconnected);   // Socket disconnected
+        this.socket.on("close", this.socketClosed);         // Socket closed
     }
 
     /**
@@ -122,9 +122,9 @@ export class TCPClient extends AbstractClient
     }
 
     /**
-     * Defines the steps to be performed during disconnect.
+     * Defines the steps to be performed during close.
      */
-    protected socketDisconnect() {
+    protected socketClose() {
         if (this.socket) {
             this.socket.end();
         }

@@ -17,7 +17,7 @@ export class AbstractClientConstructor {
             assert(client.clientOptions!.host == "host.com");
             assert(client.clientOptions!.port == 99);
 
-            assert(client.isDisconnected == false);
+            assert(client.isClosed == false);
             assert(client.clientOptions!.bufferData == undefined);
         });
     }
@@ -121,17 +121,17 @@ export class AbstractClientSend {
 }
 
 @TestSuite()
-export class AbstractClientDisconnect {
+export class AbstractClientClose {
 
     @Test()
-    public isDisconnected_does_not_trigger_socketDisconnect() {
+    public isCloseed_does_not_trigger_socketClose() {
         let flag = false;
         class TestClient extends AbstractClient {
             socketConnect() {
             }
             socketHook() {
             }
-            _socketDisconnect() {
+            _socketClose() {
                 flag = true;
             }
         }
@@ -142,14 +142,14 @@ export class AbstractClientDisconnect {
                 "host": "host.com",
                 "port": 99,
             });
-            client.isDisconnected = true;
-            client.disconnect();
+            client.isClosed = true;
+            client.close();
             assert(flag == false);
         });
     }
 
     @Test()
-    public invalid_socket_still_triggers_socketDisconnect() {
+    public invalid_socket_still_triggers_socketClose() {
         let flag = false;
         class TestClient extends AbstractClient {
             socket = null;
@@ -157,7 +157,7 @@ export class AbstractClientDisconnect {
             }
             socketHook() {
             }
-            socketDisconnect() {
+            socketClose() {
                 flag = true;
             }
         }
@@ -168,20 +168,20 @@ export class AbstractClientDisconnect {
                 "host": "host.com",
                 "port": 99,
             });
-            client.disconnect();
+            client.close();
             assert(flag == true);
         });
     }
 
     @Test()
-    public trigger_socketDisconnect() {
+    public trigger_socketClose() {
         let flag = false;
         class TestClient extends AbstractClient {
             socketConnect() {
             }
             socketHook() {
             }
-            socketDisconnect() {
+            socketClose() {
                 flag = true;
             }
         }
@@ -192,7 +192,7 @@ export class AbstractClientDisconnect {
                 "host": "host.com",
                 "port": 99,
             });
-            client.disconnect();
+            client.close();
             assert(flag == true);
         });
     }
@@ -370,9 +370,9 @@ export class AbstractClientOffConnect {
 }
 
 @TestSuite()
-export class AbstractClientOnDisconnect {
+export class AbstractClientOnClose {
     @Test()
-    public trigger_disconnect_callback() {
+    public trigger_close_callback() {
         let flag = false;
         //@ts-ignore
         class TestClient extends AbstractClient {
@@ -381,7 +381,7 @@ export class AbstractClientOnDisconnect {
             socketHook() {
             }
             on(evt: string, fn: Function) {
-                assert(evt == "disconnect");
+                assert(evt == "close");
                 assert(fn instanceof Function);
             }
         }
@@ -392,15 +392,15 @@ export class AbstractClientOnDisconnect {
                 "host": "host.com",
                 "port": 99,
             });
-            client.onDisconnect(function(){});
+            client.onClose(function(){});
         });
     }
 }
 
 @TestSuite()
-export class AbstractClientOffDisconnect {
+export class AbstractClientOffClose {
     @Test()
-    public trigger_disconnect_callback() {
+    public trigger_close_callback() {
         let flag = false;
         //@ts-ignore
         class TestClient extends AbstractClient {
@@ -409,7 +409,7 @@ export class AbstractClientOffDisconnect {
             socketHook() {
             }
             on(evt: string, fn: Function) {
-                assert(evt == "disconnect");
+                assert(evt == "close");
                 assert(fn instanceof Function);
             }
         }
@@ -420,7 +420,7 @@ export class AbstractClientOffDisconnect {
                 "host": "host.com",
                 "port": 99,
             });
-            client.offDisconnect(function(){});
+            client.offClose(function(){});
         });
     }
 }
@@ -476,7 +476,7 @@ export class AbstractClientOff {
 }
 
 @TestSuite()
-export class AbstractClientDisconnectInner {
+export class AbstractClientCloseInner {
     @Test()
     public successful_call() {
         let flag = false;
@@ -484,8 +484,8 @@ export class AbstractClientDisconnectInner {
         class TestClient extends AbstractClient {
             socketConnect() {
             }
-            socketDisconnect() {
-                this.isDisconnected = true;
+            socketClose() {
+                this.isClosed = true;
             }
             socketHook() {
             }
@@ -497,9 +497,9 @@ export class AbstractClientDisconnectInner {
                 "port": 99,
             });
             assert(flag == false);
-            assert(client.isDisconnected == false);
-            client.disconnect();
-            assert(client.isDisconnected == true);
+            assert(client.isClosed == false);
+            client.close();
+            assert(client.isClosed == true);
         });
     }
 }

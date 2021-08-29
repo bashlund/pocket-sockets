@@ -114,7 +114,7 @@ export class WSClient extends AbstractClient
             this.socketData(data);
         };
         this.socket.onerror = this.error;               // Error connecting
-        this.socket.onclose = this.socketDisconnected;  // Socket closed
+        this.socket.onclose = this.socketClosed;  // Socket closed
     }
 
     /**
@@ -128,9 +128,9 @@ export class WSClient extends AbstractClient
     }
 
     /**
-     * Defines the steps to be performed during disconnect.
+     * Defines the steps to be performed during close.
      */
-    protected socketDisconnect() {
+    protected socketClose() {
         if (this.socket) {
             this.socket.close();
         }

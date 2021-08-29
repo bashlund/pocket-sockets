@@ -9,12 +9,12 @@ export class AbstractClient
 {
     clientOptions?: ClientOptions;
     eventHandlers: {[key: string]: [Function[], (Buffer | undefined)[]]};
-    isDisconnected: boolean;
+    isClosed: boolean;
 
     constructor(clientOptions: ClientOptions) {
         this.clientOptions  = clientOptions;
         this.eventHandlers  = {};
-        this.isDisconnected = false;
+        this.isClosed = false;
     }
 
     /**
@@ -41,7 +41,7 @@ export class AbstractClient
      * @throws An error will be thrown when buffer data type is incompatible.
      */
     public send(data: Buffer) {
-        if (this.isDisconnected) {
+        if (this.isClosed) {
             return;
         }
 
@@ -53,14 +53,14 @@ export class AbstractClient
     }
 
     /**
-     * Disconnect socket.
+     * Close socket.
      */
-    public disconnect() {
-        if (this.isDisconnected) {
+    public close() {
+        if (this.isClosed) {
             return;
         }
 
-        this.socketDisconnect();
+        this.socketClose();
     }
 
     /**
@@ -123,23 +123,23 @@ export class AbstractClient
     }
 
     /**
-     * User hook for disconnect event.
+     * User hook for close event.
      *
-     * @param {Function} fn - on disconnect callback.
+     * @param {Function} fn - on close callback.
      *
      */
-    public onDisconnect(fn: Function) {
-        this.on("disconnect", fn);
+    public onClose(fn: Function) {
+        this.on("close", fn);
     }
 
     /**
-     * Unhook handler for disconnect event.
+     * Unhook handler for close event.
      *
-     * @param {Function} fn - remove disconnect callback.
+     * @param {Function} fn - remove close callback.
      *
      */
-    public offDisconnect(fn: Function) {
-        this.off("disconnect", fn);
+    public offClose(fn: Function) {
+        this.off("close", fn);
     }
 
     public getLocalAddress(): string | undefined {
@@ -187,18 +187,18 @@ export class AbstractClient
     }
 
     /**
-     * Socket-specific disconnect procedure.
+     * Socket-specific close procedure.
      */
-    protected socketDisconnect() {
+    protected socketClose() {
         throw "Function not implemented.";
     }
 
     /**
-     * Base disconnect event procedure responsible for triggering the disconnect event.
+     * Base close event procedure responsible for triggering the close event.
      */
-    protected socketDisconnected = () => {
-        this.isDisconnected = true;
-        this.triggerEvent("disconnect");
+    protected socketClosed = () => {
+        this.isClosed = true;
+        this.triggerEvent("close");
     }
 
     /**

@@ -81,7 +81,7 @@ export class VirtualClientSocketSend {
 }
 
 @TestSuite()
-export class VirtualClientSocketDisconnected {
+export class VirtualClientSocketClosed {
     @Test()
     public successful_call() {
 		let client;
@@ -89,21 +89,21 @@ export class VirtualClientSocketDisconnected {
 			let client1: any, client2: any;
 			[client1, client2 ] = CreatePair();
 
-			let disconnectCounter = 0;
+			let closeCounter = 0;
 
 			//@ts-ignore: protected method
-			client1.socketDisconnected = function() {
-				disconnectCounter++;
+			client1.socketClosed = function() {
+				closeCounter++;
 			}
 			//@ts-ignore: protected method
-			client2.socketDisconnected = function() {
-				disconnectCounter++;
+			client2.socketClosed = function() {
+				closeCounter++;
 			}
 
-			assert(disconnectCounter == 0);
+			assert(closeCounter == 0);
 			//@ts-ignore: protected method
-			client1.socketDisconnect();
-			assert(disconnectCounter == 2);
+			client1.socketClose();
+			assert(closeCounter == 2);
 		});
 	}
 }

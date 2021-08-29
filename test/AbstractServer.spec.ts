@@ -125,7 +125,7 @@ export class AbstractServerClose {
     }
 
     @Test()
-    public call_clients_disconnect() {
+    public call_clients_close() {
         class TestServer extends AbstractServer {
             _serverCreate() {
             }
@@ -133,10 +133,10 @@ export class AbstractServerClose {
             }
         }
 
-        let clientDisconnectCounter = 0;
+        let clientCloseCounter = 0;
         class Client extends AbstractClient {
-            disconnect() {
-                clientDisconnectCounter++;
+            close() {
+                clientCloseCounter++;
             }
         }
 
@@ -151,10 +151,10 @@ export class AbstractServerClose {
             server.clients.push(new Client({port: 3}));
 
             assert(server.clients.length == 3);
-            assert(clientDisconnectCounter == 0);
+            assert(clientCloseCounter == 0);
             server.close();
             assert(server.clients.length == 0);
-            assert(clientDisconnectCounter == 3);
+            assert(clientCloseCounter == 3);
         });
     }
 }
@@ -256,10 +256,10 @@ export class AbstractServerAddClient {
             }
         }
 
-        let clientOnDisconnectCounter = 0;
+        let clientOnCloseCounter = 0;
         class Client {
-            onDisconnect() {
-                clientOnDisconnectCounter++;
+            onClose() {
+                clientOnCloseCounter++;
             }
         }
 
@@ -270,12 +270,12 @@ export class AbstractServerAddClient {
             });
             assert(flag == false);
             assert(server.clients.length == 0);
-            assert(clientOnDisconnectCounter == 0);
+            assert(clientOnCloseCounter == 0);
             //@ts-ignore
             server.addClient(new Client());
             assert(flag == true);
             assert(server.clients.length == 1);
-            assert(clientOnDisconnectCounter == 1);
+            assert(clientOnCloseCounter == 1);
         });
     }
 }
@@ -293,7 +293,7 @@ export class AbstractServerRemoveClient {
             }
         }
         class Client {
-            onDisconnect() {
+            onClose() {
             }
         }
         assert.doesNotThrow(() => {

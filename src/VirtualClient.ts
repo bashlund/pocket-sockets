@@ -69,13 +69,13 @@ class VirtualClient extends AbstractClient
     }
 
     /**
-     * Specify the paired disconnect procedure.
+     * Specify the paired close procedure.
      */
-    protected socketDisconnect() {
+    protected socketClose() {
         if (this.pairedSocket) {
-            this.pairedSocket.socketDisconnected();
+            this.pairedSocket.socketClosed();
         }
-        this.socketDisconnected();
+        this.socketClosed();
     }
 
     /**

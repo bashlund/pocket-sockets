@@ -37,7 +37,7 @@ export class AbstractServer
             return;
         }
         this.serverClose();
-        this.clients.forEach( client => client.disconnect() );
+        this.clients.forEach( client => client.close() );
         this.clients = [];
     }
 
@@ -118,7 +118,7 @@ export class AbstractServer
      */
     protected addClient(client: AbstractClient) {
         this.clients.push(client);
-        client.onDisconnect( () => { this.removeClient(client) } );
+        client.onClose( () => { this.removeClient(client) } );
         this.triggerEvent("connection", client);
     }
 
