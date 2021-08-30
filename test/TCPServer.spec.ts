@@ -9,120 +9,120 @@ const tls = require("tls");
 export class TCPServerConstructor {
     @Test()
     public successful_call_with_cert() {
-		assert.doesNotThrow(() => {
-			tls.createServer = function() {
-				return {
-					"on": function(name: string, fn: Function) {
-						assert(name == "secureConnection" || name == "error" || name == "close" || name == "tlsClientError");
-						assert(typeof fn == "function");
-					}
-				}
-			}
-			const server = new TCPServer({
-				"host": "host.com",
-				"port": 99,
-				"rejectUnauthorized": undefined,
-				"cert": "valid-certificate"
-			});
-			assert(server.server);
-		});
-	}
+        assert.doesNotThrow(() => {
+            tls.createServer = function() {
+                return {
+                    "on": function(name: string, fn: Function) {
+                        assert(name == "secureConnection" || name == "error" || name == "close" || name == "tlsClientError");
+                        assert(typeof fn == "function");
+                    }
+                }
+            }
+            const server = new TCPServer({
+                "host": "host.com",
+                "port": 99,
+                "rejectUnauthorized": undefined,
+                "cert": "valid-certificate"
+            });
+            assert(server.server);
+        });
+    }
 
     @Test()
     public successful_call_without_TLS() {
-		assert.doesNotThrow(() => {
-			net.createServer = function() {
-				return {
-					"on": function(name: string, fn: Function) {
-						assert(name == "connection" || name == "error" || name == "close" || name == "tlsClientError");
-						assert(typeof fn == "function");
-					}
-				};
-			};
-			const server = new TCPServer({
-				"host": "host.com",
-				"port": 99,
-			});
-			assert(server.server);
-		});
-	}
+        assert.doesNotThrow(() => {
+            net.createServer = function() {
+                return {
+                    "on": function(name: string, fn: Function) {
+                        assert(name == "connection" || name == "error" || name == "close" || name == "tlsClientError");
+                        assert(typeof fn == "function");
+                    }
+                };
+            };
+            const server = new TCPServer({
+                "host": "host.com",
+                "port": 99,
+            });
+            assert(server.server);
+        });
+    }
 }
 
 @TestSuite()
 export class TCPServerCreate {
     @Test()
     public successful_call_with_USE_TLS() {
-		assert.doesNotThrow(() => {
-			tls.createServer = function() {
-				return {
-					"on": function(name: string, fn: Function) {
+        assert.doesNotThrow(() => {
+            tls.createServer = function() {
+                return {
+                    "on": function(name: string, fn: Function) {
                         assert(name == "secureConnection" || name == "error" || name == "close" || name == "tlsClientError");
                         assert(typeof fn == "function");
                     }
                 }
-			};
-			const server = new TCPServer({
-				"host": "host.com",
-				"port": 99,
-				"rejectUnauthorized": undefined,
-				"cert": "valid-certificate"
-			});
-			assert(server.server);
-		});
-	}
+            };
+            const server = new TCPServer({
+                "host": "host.com",
+                "port": 99,
+                "rejectUnauthorized": undefined,
+                "cert": "valid-certificate"
+            });
+            assert(server.server);
+        });
+    }
 
     @Test()
     public successful_call_without_USE_TLS() {
-		assert.doesNotThrow(() => {
-			net.createServer = function() {
-				return {
-					"on": function(name: string, fn: Function) {
+        assert.doesNotThrow(() => {
+            net.createServer = function() {
+                return {
+                    "on": function(name: string, fn: Function) {
                         assert(name == "connection" || name == "error" || name == "close" || name == "tlsClientError");
                         assert(typeof fn == "function");
                     }
                 };
-			};
-			const server = new TCPServer({
-				"host": "host.com",
-				"port": 99,
-				"rejectUnauthorized": undefined
-			});
-			assert(server.server);
-		});
-	}
+            };
+            const server = new TCPServer({
+                "host": "host.com",
+                "port": 99,
+                "rejectUnauthorized": undefined
+            });
+            assert(server.server);
+        });
+    }
 }
 
 @TestSuite()
 export class TCPServerListen {
     @Test()
     public overwritten_server_after_object_creation() {
-		assert.doesNotThrow(() => {
-			tls.createServer = function() {
-				return {
-					"on": function(name: string, fn: Function) {
+        assert.doesNotThrow(() => {
+            tls.createServer = function() {
+                return {
+                    "on": function(name: string, fn: Function) {
                         assert(name == "secureConnection" || name == "error" || name == "close" || name == "tlsClientError");
                         assert(typeof fn == "function");
                     }
                 };
-			};
-			const server = new TCPServer({
-				"host": "host.com",
-				"port": 99,
-				"rejectUnauthorized": undefined,
-				"cert": "valid-certificate"
-			});
-			server.server = undefined;
-			//@ts-ignore: protected method
-			server.serverListen();
-		});
-	}
+            };
+            const server = new TCPServer({
+                "host": "host.com",
+                "port": 99,
+                "rejectUnauthorized": undefined,
+                "cert": "valid-certificate"
+            });
+            server.server = undefined;
+            //@ts-ignore: protected method
+            server.serverListen();
+        });
+    }
 
     @Test()
     public successful_call() {
-		assert.doesNotThrow(() => {
-			tls.createServer = function() {
-				return {
-					"on": function(name: string, fn: Function) {
+        assert.doesNotThrow(() => {
+            tls.createServer = function() {
+                return {
+                    "on": function(name: string, fn: Function) {
                         assert(name == "secureConnection" || name == "error" || name == "close" || name == "tlsClientError");
                         assert(typeof fn == "function");
                     },
@@ -133,15 +133,15 @@ export class TCPServerListen {
                     }
 
                 };
-			};
-			const server = new TCPServer({
-				"host": "host.com",
-				"port": 99,
-				"rejectUnauthorized": undefined,
-				"cert": "valid-certificate"
-			});
-			//@ts-ignore: protected method
-			server.serverListen();
-		});
-	}
+            };
+            const server = new TCPServer({
+                "host": "host.com",
+                "port": 99,
+                "rejectUnauthorized": undefined,
+                "cert": "valid-certificate"
+            });
+            //@ts-ignore: protected method
+            server.serverListen();
+        });
+    }
 }
