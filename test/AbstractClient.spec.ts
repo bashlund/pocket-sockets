@@ -18,27 +18,14 @@ export class AbstractClientConstructor {
             assert(client.clientOptions!.port == 99);
 
             assert(client.isClosed == false);
+            assert(Object.keys(client.eventHandlers).length == 0);
+
             assert(client.clientOptions!.bufferData == undefined);
-        });
-    }
-
-    @Test()
-    public socket_hook_triggered() {
-        let hookFlag = false;
-        class TestClient extends AbstractClient {
-            socketConnect() {
-            }
-            socketHook() {
-                hookFlag = true;
-            }
-        }
-
-        assert.doesNotThrow(() => {
-            assert(hookFlag == false);
-            const client = new TestClient({port: 1});
-            //@ts-ignore
-            client.connect();
-            assert(hookFlag == true);
+            assert(client.clientOptions!.secure == undefined);
+            assert(client.clientOptions!.rejectUnauthorized == undefined);
+            assert(client.clientOptions!.cert == undefined);
+            assert(client.clientOptions!.key == undefined);
+            assert(client.clientOptions!.ca == undefined);
         });
     }
 }
@@ -118,13 +105,67 @@ export class AbstractClientSend {
             assert(flag == true);
         });
     }
+
+    @Test()
+    public noop_when_isClosed() {
+        let flag = false;
+        class TestClient extends AbstractClient {
+            socketSend(buffer: Buffer) {
+                flag = true;
+            }
+            socketConnect() {
+            }
+            socketHook() {
+            }
+        }
+
+        assert.doesNotThrow(() => {
+            assert(flag == false);
+            const client = new TestClient({
+                "host": "host.com",
+                "port": 99,
+            });
+            client.isClosed = true;
+            client.send(Buffer.from("testdata"));
+            assert(flag == false);
+        });
+    }
+}
+
+@TestSuite()
+export class AbstractClientSendString {
+
+    @Test()
+    public successful_call() {
+        let flag = false;
+        class TestClient extends AbstractClient {
+            socketSend(buffer: Buffer) {
+                flag = true;
+                assert(buffer.toString() == "testdata");
+            }
+            socketConnect() {
+            }
+            socketHook() {
+            }
+        }
+
+        assert.doesNotThrow(() => {
+            assert(flag == false);
+            const client = new TestClient({
+                "host": "host.com",
+                "port": 99,
+            });
+            client.sendString("testdata");
+            assert(flag == true);
+        });
+    }
 }
 
 @TestSuite()
 export class AbstractClientClose {
 
     @Test()
-    public isCloseed_does_not_trigger_socketClose() {
+    public isClosed_does_not_trigger_socketClose() {
         let flag = false;
         class TestClient extends AbstractClient {
             socketConnect() {
@@ -611,6 +652,133 @@ export class AbstractClientValidateConfig {
             assert(client.clientOptions!.cert == "mycert");
             assert(client.clientOptions!.key == "mykey");
             assert(client.clientOptions!.ca == "myca");
+        });
+    }
+}
+
+@TestSuite()
+export class AbstractClientSocketClosed {
+    @Test()
+    public successful_call() {
+        let flagOnEvent = false;
+        //@ts-ignore
+        class TestClient extends AbstractClient {
+            socketConnect() {
+            }
+            socketHook() {
+            }
+            triggerEvent(evt: string, data: boolean) {
+                flagOnEvent = true;
+                assert(evt == "close");
+                assert(data == true);
+            }
+        }
+
+        assert.doesNotThrow(() => {
+            const client = new TestClient({
+                "host": "host.com",
+                "port": 99,
+            });
+            assert(flagOnEvent == false);
+            assert(client.isClosed == false);
+            //@ts-ignore: protected method
+            client.socketClosed(true);
+            assert(client.isClosed == true);
+            assert(flagOnEvent == true);
+        });
+    }
+}
+
+@TestSuite()
+export class AbstractClientSocketConnected {
+    @Test()
+    public successful_call() {
+        let flagOnEvent = false;
+        //@ts-ignore
+        class TestClient extends AbstractClient {
+            socketConnect() {
+            }
+            socketHook() {
+            }
+            triggerEvent(evt: string, data: any) {
+                flagOnEvent = true;
+                assert(evt == "connect");
+                assert(data == undefined);
+            }
+        }
+
+        assert.doesNotThrow(() => {
+            const client = new TestClient({
+                "host": "host.com",
+                "port": 99,
+            });
+            assert(flagOnEvent == false);
+            //@ts-ignore: protected method
+            client.socketConnected();
+            assert(flagOnEvent == true);
+        });
+    }
+}
+
+@TestSuite()
+export class AbstractClientSocketError {
+    @Test()
+    public successful_call() {
+        let flagOnEvent = false;
+        //@ts-ignore
+        class TestClient extends AbstractClient {
+            socketConnect() {
+            }
+            socketHook() {
+            }
+            triggerEvent(evt: string, data: Buffer) {
+                flagOnEvent = true;
+                assert(evt == "error");
+                assert(data.toString() == "TestBuffer");
+            }
+        }
+
+        assert.doesNotThrow(() => {
+            const client = new TestClient({
+                "host": "host.com",
+                "port": 99,
+            });
+            assert(flagOnEvent == false);
+            //@ts-ignore: protected method
+            client.socketError(Buffer.from("TestBuffer"));
+            assert(flagOnEvent == true);
+        });
+    }
+}
+
+@TestSuite()
+export class AbstractClientTriggerEvent {
+    @Test()
+    public successful_call() {
+        //@ts-ignore
+        class TestClient extends AbstractClient {
+            socketConnect() {
+            }
+            socketHook() {
+            }
+        }
+
+        assert.doesNotThrow(() => {
+            const client = new TestClient({
+                "host": "host.com",
+                "port": 99,
+            });
+            let flag = false;
+            assert(flag == false);
+            const fn = function() {
+                flag = true;
+            };
+            //@ts-ignore: private method
+            client.on("testevent", fn);
+            //@ts-ignore: protected method
+            client.triggerEvent("testevent", fn);
+            //@ts-ignore: data is changed inside trigger event callback
+            assert(flag == true);
         });
     }
 }

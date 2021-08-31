@@ -22,7 +22,15 @@ export class AbstractServerConstructor {
             assert(server.serverOptions.host == "host.com");
             assert(server.serverOptions.port == 99);
             assert(server.serverOptions.rejectUnauthorized == null);
+            assert(server.serverOptions.bufferData == undefined);
+            assert(server.serverOptions.ipv6Only == undefined);
+            assert(server.serverOptions.requestCert == undefined);
+            assert(server.serverOptions.cert == undefined);
+            assert(server.serverOptions.key == undefined);
+            assert(server.serverOptions.ca == undefined);
             assert(server.clients.length == 0);
+            assert(Object.keys(server.eventHandlers).length == 0);
+            assert(server.isClosed == false);
         });
     }
 
@@ -425,6 +433,42 @@ export class AbstractServerValidateConfig {
             assert(server.serverOptions.cert == "mycert");
             assert(server.serverOptions.key == "mykey");
             assert(server.serverOptions.ca == "myca");
+        });
+    }
+}
+
+@TestSuite()
+export class AbstractServerTriggerEvent {
+
+    @Test()
+    public all_options() {
+        assert.doesNotThrow(() => {
+            class TestServer extends AbstractServer {
+                _serverCreate() {
+                }
+            }
+
+            const server = new TestServer({
+                "host": "host.com",
+                "port": 99,
+                "ipv6Only": false,
+                "requestCert": true,
+                "cert": "mycert",
+                "key": "mykey",
+                "ca": "myca",
+            });
+
+            let flag = false;
+            assert(flag == false);
+            const fn = function() {
+                flag = true;
+            };
+            //@ts-ignore: private method
+            server.on("testevent", fn);
+            //@ts-ignore: protected method
+            server.triggerEvent("testevent", fn);
+            //@ts-ignore: data is changed inside trigger event callback
+            assert(flag == true);
         });
     }
 }
