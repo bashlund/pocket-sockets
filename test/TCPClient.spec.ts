@@ -68,6 +68,67 @@ export class TCPClientSocketConnect {
         });
     }
 
+    @Test()
+    public successful_call_with_existing_socket() {
+        assert.doesNotThrow(() => {
+            //@ts-ignore: incomplete implementation
+            let socket = new net.Socket();
+            let flagOnEvent = false;
+            //@ts-ignore: incomplete inheritance
+            class TestClient extends TCPClient {
+                triggerEvent(evt: string, data: any) {
+                    if(evt == "close") {
+                        flagOnEvent = true;
+                    }
+                }
+            }
+            //@ts-ignore: incomplete socket specification
+            const client = new TCPClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            }, /*@ts-ignore*/ socket);
+
+            assert(client.socket != null);
+
+            //@ts-ignore: protected method
+            client.triggerEvent("close");
+        });
+    }
+
+    @Test()
+    public socket_already_created() {
+        assert.throws(() => {
+            //@ts-ignore: incomplete implementation
+            let socket = new net.Socket();
+            //@ts-ignore: incomplete socket specification
+            const client = new TCPClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            }, /*@ts-ignore*/ socket);
+
+            assert(client.socket != null);
+            client.connect();
+        }, /Socket already created./);
+    }
+
+    @Test()
+    public missing_client_options() {
+        assert.throws(() => {
+            //@ts-ignore: incomplete socket specification
+            const client = new TCPClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            });
+
+            client.clientOptions = undefined;
+            client.connect();
+        }, /clientOptions is required to create socket./);
+    }
+
+
 }
 
 @TestSuite()
@@ -144,6 +205,32 @@ export class TCPClientSocketClose {
             client.socketClose();
             //@ts-ignore
             assert(hasEnded == true);
+        });
+    }
+}
+
+@TestSuite()
+export class TCPClientSocketError {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            const client = new TCPClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            });
+            let flag = false;
+            //@ts-ignore: protected method
+            client.socketError = function(data: Buffer) {
+                flag = true;
+                //@ts-ignore
+                assert(data.toString() == "Test Error");
+            };
+            assert(flag == false);
+            //@ts-ignore: protected method
+            client.error(new Error("Test Error"));
+            //@ts-ignore
+            assert(flag == true);
         });
     }
 }
