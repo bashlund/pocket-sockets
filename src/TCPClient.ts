@@ -24,7 +24,7 @@ export class TCPClient extends AbstractClient
      * @return {string | undefined} local IP address
      */
     public getLocalAddress(): string | undefined {
-        if (this.socket && this.socket.localAddress) {
+        if (this.socket && typeof this.socket.localAddress === "string") {
             return this.socket.localAddress;
         }
     }
@@ -33,7 +33,7 @@ export class TCPClient extends AbstractClient
      * @return {string | undefined} remote IP address
      */
     public getRemoteAddress(): string | undefined {
-        if (this.socket && this.socket.remoteAddress) {
+        if (this.socket && typeof this.socket.remoteAddress === "string") {
             return this.socket.remoteAddress;
         }
     }
