@@ -46,6 +46,25 @@ export class TCPServerConstructor {
             assert(server.server);
         });
     }
+
+    @Test()
+    public calls_serverCreate() {
+        assert.doesNotThrow(() => {
+            let flag = false;
+            class TestServer extends TCPServer {
+                serverCreate() {
+                    flag = true;
+                }
+            }
+            const server = new TestServer({
+                "host": "host.com",
+                "port": 99,
+            });
+            //@ts-ignore: state is expected to be changed by custom serverCreate
+            assert(flag == true);
+        });
+    }
+
 }
 
 @TestSuite()
@@ -142,6 +161,83 @@ export class TCPServerListen {
             });
             //@ts-ignore: protected method
             server.serverListen();
+        });
+    }
+}
+
+@TestSuite()
+export class TCPServerClose {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            const server = new TCPServer({
+                "host": "host.com",
+                "port": 99,
+                "rejectUnauthorized": undefined,
+                "cert": "valid-certificate"
+            });
+            let flag = false;
+            //@ts-ignore: custom signature
+            server.server!.close = function() {
+                flag = true;
+            }
+            assert(flag == false);
+            //@ts-ignore: protected method
+            server.serverClose();
+            //@ts-ignore: expected to be mutated by custom close procedure
+            assert(flag == true);
+        });
+    }
+}
+
+@TestSuite()
+export class TCPServerClientConnected {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            const server = new TCPServer({
+                "host": "host.com",
+                "port": 99,
+                "rejectUnauthorized": undefined,
+                "cert": "valid-certificate"
+            });
+            let flag = false;
+            //@ts-ignore: custom signature
+            server.addClient = function(client) {
+                assert(client);
+                flag = true;
+            }
+            assert(flag == false);
+            //@ts-ignore: protected method
+            server.clientConnected();
+            //@ts-ignore: expected to be mutated by custom procedure
+            assert(flag == true);
+        });
+    }
+}
+
+@TestSuite()
+export class TCPServerError {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            const server = new TCPServer({
+                "host": "host.com",
+                "port": 99,
+                "rejectUnauthorized": undefined,
+                "cert": "valid-certificate"
+            });
+            let flag = false;
+            //@ts-ignore: custom signature
+            server.serverError = function(buffer) {
+                assert(buffer.toString() == "Error Message Here");
+                flag = true;
+            }
+            assert(flag == false);
+            //@ts-ignore: protected method
+            server.error(new Error("Error Message Here"));
+            //@ts-ignore: expected to be mutated by custom procedure
+            assert(flag == true);
         });
     }
 }

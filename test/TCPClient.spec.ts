@@ -234,3 +234,207 @@ export class TCPClientSocketError {
         });
     }
 }
+
+@TestSuite()
+export class TCPClientGetLocalAddress {
+    @Test()
+    public retrieve_undefined() {
+        assert.doesNotThrow(() => {
+            const client = new TCPClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            });
+            //@ts-ignore: incomplete implementation
+            client.socket = {
+            }
+            assert(client.getLocalAddress() == undefined);
+        });
+    }
+
+    @Test()
+    public retrieve_undefined_when_null() {
+        assert.doesNotThrow(() => {
+            const client = new TCPClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            });
+            //@ts-ignore: incomplete implementation
+            client.socket = {
+                //@ts-ignore: unexpected data conversion
+                localAddress: null
+            }
+            assert(client.getLocalAddress() == undefined);
+        });
+    }
+
+    @Test()
+    public retrieve_string() {
+        assert.doesNotThrow(() => {
+            const client = new TCPClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            });
+            //@ts-ignore: incomplete implementation
+            client.socket = {
+                localAddress: "host.com"
+            }
+            assert(client.getLocalAddress() == "host.com");
+        });
+    }
+}
+
+@TestSuite()
+export class TCPClientGetRemoteAddress {
+    @Test()
+    public retrieve_undefined() {
+        assert.doesNotThrow(() => {
+            const client = new TCPClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            });
+            //@ts-ignore: incomplete implementation
+            client.socket = {
+            }
+            assert(client.getRemoteAddress() == undefined);
+        });
+    }
+
+    @Test()
+    public retrieve_undefined_when_null() {
+        assert.doesNotThrow(() => {
+            const client = new TCPClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            });
+            //@ts-ignore: incomplete implementation
+            client.socket = {
+                //@ts-ignore: unexpected data conversion
+                remoteAddress: null
+            }
+            assert(client.getRemoteAddress() == undefined);
+        });
+    }
+
+    @Test()
+    public retrieve_string() {
+        assert.doesNotThrow(() => {
+            const client = new TCPClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            });
+            //@ts-ignore: incomplete implementation
+            client.socket = {
+                remoteAddress: "host.com"
+            }
+            assert(client.getRemoteAddress() == "host.com");
+        });
+    }
+}
+
+@TestSuite()
+export class TCPClientGetRemotePort {
+    @Test()
+    public retrieve_undefined() {
+        assert.doesNotThrow(() => {
+            const client = new TCPClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            });
+            //@ts-ignore: incomplete implementation
+            client.socket = {
+            }
+            assert(client.getRemotePort() == undefined);
+        });
+    }
+
+    @Test()
+    public retrieve_undefined_when_null() {
+        assert.doesNotThrow(() => {
+            const client = new TCPClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            });
+            //@ts-ignore: incomplete implementation
+            client.socket = {
+                //@ts-ignore: unexpected data conversion
+                remotePort: null
+            }
+            assert(client.getRemotePort() == undefined);
+        });
+    }
+
+    @Test()
+    public retrieve_string() {
+        assert.doesNotThrow(() => {
+            const client = new TCPClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            });
+            //@ts-ignore: incomplete implementation
+            client.socket = {
+                remotePort: 999
+            }
+            assert(client.getRemotePort() == 999);
+        });
+    }
+}
+
+@TestSuite()
+export class TCPClientGetLocalPort {
+    @Test()
+    public retrieve_undefined() {
+        assert.doesNotThrow(() => {
+            const client = new TCPClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            });
+            //@ts-ignore: incomplete implementation
+            client.socket = {
+            }
+            assert(client.getLocalPort() == undefined);
+        });
+    }
+
+    @Test()
+    public retrieve_undefined_when_null() {
+        assert.doesNotThrow(() => {
+            const client = new TCPClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            });
+            //@ts-ignore: incomplete implementation
+            client.socket = {
+                //@ts-ignore: unexpected data conversion
+                localPort: null
+            }
+            assert(client.getLocalPort() == undefined);
+        });
+    }
+
+    @Test()
+    public retrieve_string() {
+        assert.doesNotThrow(() => {
+            const client = new TCPClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            });
+            //@ts-ignore: incomplete implementation
+            client.socket = {
+                localPort: 999
+            }
+            assert(client.getLocalPort() == 999);
+        });
+    }
+}

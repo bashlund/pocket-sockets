@@ -25,6 +25,7 @@ export class VirtualClientConstructor {
             assert(client1.pairedSocket);
             assert(client2.pairedSocket);
             assert(client2.pairedSocket!.pairedSocket);
+            assert(client2.pairedSocket!.outQueue.length == 0);
         });
     }
 }
@@ -40,6 +41,22 @@ export class VirtualClientSetLatency {
             assert(client1.latency == 0);
             client1.setLatency(20);
             assert(client1.latency == 20);
+        });
+    }
+}
+
+@TestSuite()
+export class VirtualClientSocketHook {
+    @Test()
+    public noop_call() {
+        let client;
+        assert.doesNotThrow(() => {
+            let client1, client2;
+            [client1, client2 ] = CreatePair();
+            //@ts-ignore: protected method
+            client1.socketHook();
+            //@ts-ignore: protected method
+            client2.socketHook();
         });
     }
 }
