@@ -35,13 +35,12 @@ export class WSServer extends AbstractServer
                 handshakeTimeout: 30000,
             };
             this.server = https.createServer(tlsOptions);
+            if (this.server) {
+                this.server.on("tlsClientError", this.error);
+            }
         }
         else {
             this.server = http.createServer();
-        }
-
-        if (this.server) {
-            this.server.on("tlsClientError", this.error);
         }
     }
 
