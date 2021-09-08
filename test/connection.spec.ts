@@ -52,4 +52,36 @@ export class Connection {
             });
         });
     }
+
+    @Test()
+    public async clientserver_missing_host() {
+        await new Promise(resolve => {
+            const serverOptions = {
+                port: 8182
+            };
+            const server = new WSServer(serverOptions);
+            server.listen();
+
+            server.onConnection( (client: AbstractClient) => {
+                client.onData( (data: Buffer) => {
+                    assert(data.toString() == "hello");
+                    server.close();
+                    resolve();
+                });
+            });
+
+            const clientOptions = {
+                port: 8182
+            };
+            const client = new WSClient(clientOptions);
+            client.connect();
+
+            client.onConnect( () => {
+                client.onData( (data: Buffer) => {
+                    client.close();
+                });
+                client.sendString("hello");
+            });
+        });
+    }
 }

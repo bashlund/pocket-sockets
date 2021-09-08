@@ -59,14 +59,15 @@ export class WSClient extends AbstractClient
             throw "clientOptions is required to create socket.";
         }
 
+        const host = this.clientOptions.host ? this.clientOptions.host : "localhost";
         const USE_TLS = this.clientOptions.secure ? true: false;
 
         let address;
         if(USE_TLS) {
-            address = `wss://${this.clientOptions.host}:${this.clientOptions.port}`;
+            address = `wss://${host}:${this.clientOptions.port}`;
         }
         else {
-            address = `ws://${this.clientOptions.host}:${this.clientOptions.port}`;
+            address = `ws://${host}:${this.clientOptions.port}`;
         }
 
         if(isBrowser) {
