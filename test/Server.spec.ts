@@ -1,14 +1,14 @@
 import { TestSuite, Test } from "testyts";
-import {AbstractServer, AbstractClient} from "../index";
+import {Server, Client} from "../index";
 
 const assert = require("assert");
 
 @TestSuite()
-export class AbstractServerConstructor {
+export class ServerConstructor {
 
     @Test()
     public valid_options() {
-        class TestServer extends AbstractServer {
+        class TestServer extends Server {
             _serverCreate() {
             }
         }
@@ -36,7 +36,7 @@ export class AbstractServerConstructor {
 
     public server_create_triggered() {
         let flag = false;
-        class TestServer extends AbstractServer {
+        class TestServer extends Server {
             _serverCreate() {
                 flag = true;
             }
@@ -55,12 +55,12 @@ export class AbstractServerConstructor {
 }
 
 @TestSuite()
-export class AbstractServerServerClose {
+export class ServerServerClose {
 
     @Test()
     public trigger_server_close() {
         let flag = false;
-        class TestServer extends AbstractServer {
+        class TestServer extends Server {
             _serverCreate() {
             }
             serverClose() {
@@ -82,12 +82,12 @@ export class AbstractServerServerClose {
 }
 
 @TestSuite()
-export class AbstractServerListen {
+export class ServerListen {
 
     @Test()
     public trigger_server_listen() {
         let flag = false;
-        class TestServer extends AbstractServer {
+        class TestServer extends Server {
             _serverCreate() {
             }
             serverListen() {
@@ -108,12 +108,12 @@ export class AbstractServerListen {
 }
 
 @TestSuite()
-export class AbstractServerClose {
+export class ServerClose {
 
     @Test()
     public call_server_close() {
         let flag = false;
-        class TestServer extends AbstractServer {
+        class TestServer extends Server {
             _serverCreate() {
             }
             serverClose() {
@@ -134,7 +134,7 @@ export class AbstractServerClose {
 
     @Test()
     public call_clients_close() {
-        class TestServer extends AbstractServer {
+        class TestServer extends Server {
             _serverCreate() {
             }
             serverClose() {
@@ -142,7 +142,7 @@ export class AbstractServerClose {
         }
 
         let clientCloseCounter = 0;
-        class Client extends AbstractClient {
+        class MyClient extends Client {
             close() {
                 clientCloseCounter++;
             }
@@ -154,9 +154,9 @@ export class AbstractServerClose {
                 "port": 99,
             });
 
-            server.clients.push(new Client({port: 1}));
-            server.clients.push(new Client({port: 2}));
-            server.clients.push(new Client({port: 3}));
+            server.clients.push(new MyClient({port: 1}));
+            server.clients.push(new MyClient({port: 2}));
+            server.clients.push(new MyClient({port: 3}));
 
             assert(server.clients.length == 3);
             assert(clientCloseCounter == 0);
@@ -168,13 +168,13 @@ export class AbstractServerClose {
 }
 
 @TestSuite()
-export class AbstractServerOnConnection {
+export class ServerOnConnection {
 
     @Test()
     public trigger_connection_callback() {
         let flag = false;
         //@ts-ignore
-        class TestServer extends AbstractServer {
+        class TestServer extends Server {
             _serverCreate() {
             }
             on(evt: string, fn: Function) {
@@ -195,13 +195,13 @@ export class AbstractServerOnConnection {
 }
 
 @TestSuite()
-export class AbstractServerOnError {
+export class ServerOnError {
 
     @Test()
     public trigger_error_callback() {
         let flag = false;
         //@ts-ignore
-        class TestServer extends AbstractServer {
+        class TestServer extends Server {
             _serverCreate() {
             }
             on(evt: string, fn: Function) {
@@ -222,13 +222,13 @@ export class AbstractServerOnError {
 }
 
 @TestSuite()
-export class AbstractServerOnClose {
+export class ServerOnClose {
 
     @Test()
     public trigger_close_callback() {
         let flag = false;
         //@ts-ignore
-        class TestServer extends AbstractServer {
+        class TestServer extends Server {
             _serverCreate() {
             }
             on(evt: string, fn: Function) {
@@ -249,13 +249,13 @@ export class AbstractServerOnClose {
 }
 
 @TestSuite()
-export class AbstractServerAddClient {
+export class ServerAddClient {
 
     @Test()
     public successful_call() {
         let flag = false;
         //@ts-ignore
-        class TestServer extends AbstractServer {
+        class TestServer extends Server {
             _serverCreate() {
             }
             triggerEvent(evt: string) {
@@ -289,12 +289,12 @@ export class AbstractServerAddClient {
 }
 
 @TestSuite()
-export class AbstractServerRemoveClient {
+export class ServerRemoveClient {
 
     @Test()
     public successful_call() {
         //@ts-ignore
-        class TestServer extends AbstractServer {
+        class TestServer extends Server {
             _serverCreate() {
             }
             triggerEvent(evt: string) {
@@ -322,13 +322,13 @@ export class AbstractServerRemoveClient {
 }
 
 @TestSuite()
-export class AbstractServerError {
+export class ServerError {
 
     @Test()
     public successful_call() {
         let flag = false;
         //@ts-ignore
-        class TestServer extends AbstractServer {
+        class TestServer extends Server {
             _serverCreate() {
             }
             triggerEvent(evt: string) {
@@ -351,13 +351,13 @@ export class AbstractServerError {
 }
 
 @TestSuite()
-export class AbstractServerCloseInner {
+export class ServerCloseInner {
 
     @Test()
     public successful_call() {
         let flag = false;
         //@ts-ignore
-        class TestServer extends AbstractServer {
+        class TestServer extends Server {
             _serverCreate() {
             }
             triggerEvent(evt: string) {
@@ -380,11 +380,11 @@ export class AbstractServerCloseInner {
 }
 
 @TestSuite()
-export class AbstractServerOn {
+export class ServerOn {
 
     @Test()
     public successful_call() {
-        class TestServer extends AbstractServer {
+        class TestServer extends Server {
             _serverCreate() {
             }
             _socketHook() {
@@ -405,12 +405,12 @@ export class AbstractServerOn {
 }
 
 @TestSuite()
-export class AbstractServerValidateConfig {
+export class ServerValidateConfig {
 
     @Test()
     public all_options() {
         assert.doesNotThrow(() => {
-            class TestServer extends AbstractServer {
+            class TestServer extends Server {
                 _serverCreate() {
                 }
             }
@@ -438,12 +438,12 @@ export class AbstractServerValidateConfig {
 }
 
 @TestSuite()
-export class AbstractServerTriggerEvent {
+export class ServerTriggerEvent {
 
     @Test()
     public all_options() {
         assert.doesNotThrow(() => {
-            class TestServer extends AbstractServer {
+            class TestServer extends Server {
                 _serverCreate() {
                 }
             }

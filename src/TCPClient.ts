@@ -1,13 +1,13 @@
 import * as net from "net";
 import * as tls from "tls";
 
-import {AbstractClient} from "./AbstractClient";
+import {Client} from "./Client";
 import {ClientOptions} from "./types";
 
 /**
  * TCP client socket implementation.
  */
-export class TCPClient extends AbstractClient
+export class TCPClient extends Client
 {
     socket?: net.Socket;
 

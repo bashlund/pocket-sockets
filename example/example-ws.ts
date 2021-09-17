@@ -15,7 +15,7 @@
 //   Server: client connection closed
 //
 
-import {WSServer, WSClient, AbstractClient} from "../index";
+import {WSServer, WSClient, Client} from "../index";
 
 console.log("pocket-sockets: WS example");
 const serverOptions = {
@@ -26,7 +26,7 @@ const server = new WSServer(serverOptions);
 server.listen();
 console.log("Server: listening...");
 
-server.onConnection( (client: AbstractClient) => {
+server.onConnection( (client: Client) => {
     console.log("Server: socket accepted");
     client.onData( (data: Buffer) => {
         console.log("Server: incoming client data", data);

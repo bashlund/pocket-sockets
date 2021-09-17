@@ -4,7 +4,7 @@ if(typeof "process" === "undefined" && !process && !process.versions && !process
     require("regenerator-runtime/runtime");
 }
 
-import {AbstractClient} from "./AbstractClient";
+import {Client} from "./Client";
 import {ClientOptions} from "./types";
 import * as ws from "ws";
 
@@ -34,7 +34,7 @@ if (typeof WebSocket !== "undefined") {
 /**
  * WebSocket client implementation.
  */
-export class WSClient extends AbstractClient
+export class WSClient extends Client
 {
     socket?: ws;
 

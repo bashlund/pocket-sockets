@@ -1,15 +1,17 @@
 import { TestSuite, Test } from "testyts";
-import {AbstractClient} from "../index";
+import {Client} from "../index";
 
 const assert = require("assert");
 
 @TestSuite()
-export class AbstractClientConstructor {
+export class ClientConstructor {
 
     @Test()
     public valid_options() {
         assert.doesNotThrow(() => {
-            const client = new AbstractClient({
+            class MyClient extends Client {
+            }
+            const client = new MyClient({
                 "host": "host.com",
                 "port": 99
             });
@@ -31,12 +33,12 @@ export class AbstractClientConstructor {
 }
 
 @TestSuite()
-export class AbstractClientConnect {
+export class ClientConnect {
 
     @Test()
     public socket_connect_triggered() {
         let flag = false;
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
                 flag = true;
             }
@@ -58,7 +60,7 @@ export class AbstractClientConnect {
     @Test()
     public socket_hook_triggered() {
         let flag = false;
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -79,12 +81,12 @@ export class AbstractClientConnect {
 }
 
 @TestSuite()
-export class AbstractClientSend {
+export class ClientSend {
 
     @Test()
     public buffer_is_Buffer() {
         let flag = false;
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketSend(buffer: Buffer) {
                 flag = true;
                 assert(buffer.toString() == "testdata");
@@ -109,7 +111,7 @@ export class AbstractClientSend {
     @Test()
     public noop_when_isClosed() {
         let flag = false;
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketSend(buffer: Buffer) {
                 flag = true;
             }
@@ -133,12 +135,12 @@ export class AbstractClientSend {
 }
 
 @TestSuite()
-export class AbstractClientSendString {
+export class ClientSendString {
 
     @Test()
     public successful_call() {
         let flag = false;
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketSend(buffer: Buffer) {
                 flag = true;
                 assert(buffer.toString() == "testdata");
@@ -162,12 +164,12 @@ export class AbstractClientSendString {
 }
 
 @TestSuite()
-export class AbstractClientClose {
+export class ClientClose {
 
     @Test()
     public isClosed_does_not_trigger_socketClose() {
         let flag = false;
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -192,7 +194,7 @@ export class AbstractClientClose {
     @Test()
     public invalid_socket_still_triggers_socketClose() {
         let flag = false;
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socket = null;
             socketConnect() {
             }
@@ -217,7 +219,7 @@ export class AbstractClientClose {
     @Test()
     public trigger_socketClose() {
         let flag = false;
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -240,13 +242,13 @@ export class AbstractClientClose {
 }
 
 @TestSuite()
-export class AbstractClientOnError {
+export class ClientOnError {
 
     @Test()
     public trigger_error_callback() {
         let flag = false;
         //@ts-ignore
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -269,13 +271,13 @@ export class AbstractClientOnError {
 }
 
 @TestSuite()
-export class AbstractClientOffError {
+export class ClientOffError {
 
     @Test()
     public trigger_error_callback() {
         let flag = false;
         //@ts-ignore
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -298,12 +300,12 @@ export class AbstractClientOffError {
 }
 
 @TestSuite()
-export class AbstractClientOnData {
+export class ClientOnData {
     @Test()
     public trigger_data_callback() {
         let flag = false;
         //@ts-ignore
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -326,12 +328,12 @@ export class AbstractClientOnData {
 }
 
 @TestSuite()
-export class AbstractClientOffData {
+export class ClientOffData {
     @Test()
     public trigger_data_callback() {
         let flag = false;
             //@ts-ignore
-            class TestClient extends AbstractClient {
+            class TestClient extends Client {
                 socketConnect() {
                 }
                 socketHook() {
@@ -355,12 +357,12 @@ export class AbstractClientOffData {
 }
 
 @TestSuite()
-export class AbstractClientOnConnect {
+export class ClientOnConnect {
     @Test()
     public trigger_connect_callback() {
         let flag = false;
         //@ts-ignore
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -383,12 +385,12 @@ export class AbstractClientOnConnect {
 }
 
 @TestSuite()
-export class AbstractClientOffConnect {
+export class ClientOffConnect {
     @Test()
     public trigger_connect_callback() {
         let flag = false;
         //@ts-ignore
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -411,12 +413,12 @@ export class AbstractClientOffConnect {
 }
 
 @TestSuite()
-export class AbstractClientOnClose {
+export class ClientOnClose {
     @Test()
     public trigger_close_callback() {
         let flag = false;
         //@ts-ignore
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -439,12 +441,12 @@ export class AbstractClientOnClose {
 }
 
 @TestSuite()
-export class AbstractClientOffClose {
+export class ClientOffClose {
     @Test()
     public trigger_close_callback() {
         let flag = false;
         //@ts-ignore
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -467,10 +469,10 @@ export class AbstractClientOffClose {
 }
 
 @TestSuite()
-export class AbstractClientOn {
+export class ClientOn {
     @Test()
     public successful_call() {
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -491,10 +493,10 @@ export class AbstractClientOn {
 }
 
 @TestSuite()
-export class AbstractClientOff {
+export class ClientOff {
     @Test()
     public successful_call() {
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -517,12 +519,12 @@ export class AbstractClientOff {
 }
 
 @TestSuite()
-export class AbstractClientCloseInner {
+export class ClientCloseInner {
     @Test()
     public successful_call() {
         let flag = false;
         //@ts-ignore
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketClose() {
@@ -546,12 +548,12 @@ export class AbstractClientCloseInner {
 }
 
 @TestSuite()
-export class AbstractClientData {
+export class ClientData {
     @Test()
     public data_is_Buffer() {
         let flag = false;
         //@ts-ignore
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -576,12 +578,12 @@ export class AbstractClientData {
 }
 
 @TestSuite()
-export class AbstractClientConnectInner {
+export class ClientConnectInner {
     @Test()
     public successful_call() {
         let flag = false;
         //@ts-ignore
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -603,12 +605,12 @@ export class AbstractClientConnectInner {
 }
 
 @TestSuite()
-export class AbstractClientError {
+export class ClientError {
     @Test()
     public successful_call() {
         let flag = false;
         //@ts-ignore
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -633,11 +635,13 @@ export class AbstractClientError {
 }
 
 @TestSuite()
-export class AbstractClientValidateConfig {
+export class ClientValidateConfig {
     @Test()
     public all_options() {
         assert.doesNotThrow(() => {
-            const client = new AbstractClient({
+            class MyClient extends Client {
+            }
+            const client = new MyClient({
                 "host": "host.com",
                 "port": 99,
                 "cert": "mycert",
@@ -657,12 +661,12 @@ export class AbstractClientValidateConfig {
 }
 
 @TestSuite()
-export class AbstractClientSocketClosed {
+export class ClientSocketClosed {
     @Test()
     public successful_call() {
         let flagOnEvent = false;
         //@ts-ignore
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -690,12 +694,12 @@ export class AbstractClientSocketClosed {
 }
 
 @TestSuite()
-export class AbstractClientSocketConnected {
+export class ClientSocketConnected {
     @Test()
     public successful_call() {
         let flagOnEvent = false;
         //@ts-ignore
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -721,12 +725,12 @@ export class AbstractClientSocketConnected {
 }
 
 @TestSuite()
-export class AbstractClientSocketError {
+export class ClientSocketError {
     @Test()
     public successful_call() {
         let flagOnEvent = false;
         //@ts-ignore
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {
@@ -752,11 +756,11 @@ export class AbstractClientSocketError {
 }
 
 @TestSuite()
-export class AbstractClientTriggerEvent {
+export class ClientTriggerEvent {
     @Test()
     public successful_call() {
         //@ts-ignore
-        class TestClient extends AbstractClient {
+        class TestClient extends Client {
             socketConnect() {
             }
             socketHook() {

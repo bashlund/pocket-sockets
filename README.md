@@ -17,7 +17,7 @@ const server = new WSServer({
 });
 server.listen();
 
-server.onConnection( (client: AbstractClient) => {
+server.onConnection( (client: Client) => {
     client.onData( (data: Buffer) => {
         client.sendString("This is server: received!");
     });

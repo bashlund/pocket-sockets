@@ -1,6 +1,6 @@
 import { TestSuite, Test } from "testyts";
 import {TCPClient, WSClient} from "../index";
-import {TCPServer, WSServer, AbstractClient} from "../index";
+import {TCPServer, WSServer, Client} from "../index";
 
 const assert = require("assert");
 
@@ -17,7 +17,7 @@ export class Connection {
             const server = new WSServer(serverOptions);
             server.listen();
 
-            server.onConnection( (client: AbstractClient) => {
+            server.onConnection( (client: Client) => {
                 console.log("Socket accepted");
                 client.onData( (data: Buffer) => {
                     console.log("Incoming data", data);
@@ -62,7 +62,7 @@ export class Connection {
             const server = new WSServer(serverOptions);
             server.listen();
 
-            server.onConnection( (client: AbstractClient) => {
+            server.onConnection( (client: Client) => {
                 client.onData( (data: Buffer) => {
                     assert(data.toString() == "hello");
                     server.close();

@@ -1,14 +1,14 @@
 import * as net from "net";
 import * as tls from "tls";
 
-import {AbstractServer} from "./AbstractServer";
+import {Server} from "./Server";
 import {TCPClient} from "./TCPClient";
 import {ServerOptions} from "./types";
 
 /**
  * TCP server implementation.
  */
-export class TCPServer extends AbstractServer
+export class TCPServer extends Server
 {
     server?: net.Server;
 

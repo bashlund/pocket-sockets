@@ -1,4 +1,4 @@
-import {AbstractServer} from "./AbstractServer";
+import {Server} from "./Server";
 import {WSClient} from "./WSClient";
 import {ServerOptions} from "./types";
 import * as WebSocket from "ws";
@@ -8,7 +8,7 @@ import * as https from "https";
 /**
  * WebSocket server implementation.
  */
-export class WSServer extends AbstractServer
+export class WSServer extends Server
 {
     server?: http.Server | https.Server;
     wsServer?: WebSocket.Server;

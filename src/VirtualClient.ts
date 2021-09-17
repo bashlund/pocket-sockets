@@ -1,6 +1,6 @@
-import {AbstractClient} from "./AbstractClient";
+import {Client} from "./Client";
 
-class VirtualClient extends AbstractClient
+class VirtualClient extends Client
 {
     pairedSocket?: VirtualClient;
     latency: number;

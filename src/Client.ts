@@ -5,7 +5,7 @@ import {ClientOptions} from "./types";
  *
  * Socket specific functions need to be overridden/implemented in dervived classes.
  */
-export class AbstractClient
+export abstract class Client
 {
     clientOptions?: ClientOptions;
     eventHandlers: {[key: string]: [Function[], (Buffer | undefined)[]]};

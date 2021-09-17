@@ -15,7 +15,7 @@
 //   Client: closed
 //
 
-import {TCPServer, TCPClient, AbstractClient} from "../index";
+import {TCPServer, TCPClient, Client} from "../index";
 
 console.log("pocket-sockets: TCP example");
 const serverOptions = {
@@ -26,7 +26,7 @@ const server = new TCPServer(serverOptions);
 server.listen();
 console.log("Server: listening...");
 
-server.onConnection( (client: AbstractClient) => {
+server.onConnection( (client: Client) => {
     console.log("Server: socket accepted");
     client.onData( (data: Buffer) => {
         console.log("Server: incoming client data", data);

@@ -1,4 +1,4 @@
-import {AbstractClient} from "./AbstractClient";
+import {Client} from "./Client";
 import {ServerOptions} from "./types";
 
 /**
@@ -7,12 +7,12 @@ import {ServerOptions} from "./types";
  * Socket specific functions need to be overridden/implemented.
  *
  */
-export class AbstractServer
+export abstract class Server
 {
     serverOptions: ServerOptions;
     eventHandlers: {[key: string]: Function[]};
     isClosed: boolean;
-    clients: AbstractClient[];
+    clients: Client[];
 
     constructor(serverOptions: ServerOptions) {
         this.serverOptions  = serverOptions;
@@ -114,9 +114,9 @@ export class AbstractServer
     /**
      * Performs all operations involved in registering a new client connection.
      *
-     * @param {AbstractClient} client
+     * @param {Client} client
      */
-    protected addClient(client: AbstractClient) {
+    protected addClient(client: Client) {
         this.clients.push(client);
         client.onClose( () => { this.removeClient(client) } );
         this.triggerEvent("connection", client);
@@ -125,9 +125,9 @@ export class AbstractServer
     /**
      * Performs all operations involved in removing an existing client registration.
      *
-     * @param {AbstractClient} client
+     * @param {Client} client
      */
-    private removeClient(client: AbstractClient) {
+    private removeClient(client: Client) {
         const index = this.clients.indexOf(client);
         if (index > -1) {
             this.clients.splice(index, 1)
