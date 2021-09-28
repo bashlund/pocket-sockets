@@ -1,7 +1,7 @@
 {
   "name": "pocket-sockets",
-  "version": "0.9.0",
-  "description": "A powerful and smooth sockets library for browser and nodejs, supporting both websockets and regular TCP sockets, encrypted or not.",
+  "version": "1.0.0",
+  "description": "A powerful and smooth client/server sockets library for browser and NodeJS. Supports both WebSockets and regular TCP sockets, TLS encrypted or not.",
   "keywords": [
     "sockets",
     "library",
