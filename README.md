@@ -63,6 +63,7 @@ npm test
 ```sh
 git clone https://github.com/bashlund/pocket-sockets.git
 cd pocket-sockets
+npm isntall
 npx ts-node ./example/example-ws.ts
 npx ts-node ./example/example-tcp.ts
 ```
