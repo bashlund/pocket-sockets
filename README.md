@@ -81,5 +81,8 @@ npm add --save pocket-sockets
 ## Reference
 Code documentation and API references are available in the official [Wiki](https://github.com/bashlund/pocket-sockets/wiki): [https://github.com/bashlund/pocket-sockets/wiki](https://github.com/bashlund/pocket-sockets/wiki).
 
+## Credits
+Lib written by @bashlund, tests and wiki nicely crafted by @filippsen.
+
 ## License
 This project is released under the _MIT_ license.
