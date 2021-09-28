@@ -19,7 +19,9 @@ The overall interface for _pocket-sockets_ _WebSocket_ and _TCP_ sockets **are i
 
 ## Example
 For a quick glimpse of what it looks like to set up a server that receives a string from clients, then replies back and closes the connection afterwards, follow the example below:
-```javascript
+```typescript
+import {WSServer, WSClient, Client} from "pocket-sockets";
+
 const server = new WSServer({
     host: "localhost",
     port: 8181

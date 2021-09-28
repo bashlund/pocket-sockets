@@ -30,10 +30,13 @@
   "engines": {
     "node": ">=12"
   },
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "scripts": {
     "test": "./node_modules/.bin/testyts",
     "docs": "./node_modules/.bin/typedoc --entryDocument Home.md --hideBreadcrumbs true --hideInPageTOC true --cleanOutputDir false ./src/*.ts",
-    "c": "./node_modules/.bin/tsc"
+    "c": "./node_modules/.bin/tsc",
+    "prepublishOnly": "tsc"
   },
   "dependencies": {
     "ws": "^8.2.0"

@@ -4,9 +4,13 @@
         "experimentalDecorators": true,
         "preserveConstEnums": true,
         "outDir": "build",
-        "module": "commonjs"
+        "module": "commonjs",
+        "declaration": true
     },
     "files": [
         "./index.ts"
+    ],
+    "include": [
+        "src/**/*"
     ]
 }
