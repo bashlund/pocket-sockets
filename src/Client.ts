@@ -163,6 +163,15 @@ export abstract class Client
     }
 
     /**
+     * Unread data by putting it back into the event queue.
+     * @param {Buffer} data
+     */
+    public unRead(data: Buffer) {
+        const bufferData = this.clientOptions?.bufferData === undefined ? true : this.clientOptions.bufferData;
+        this.triggerEvent("data", data, bufferData, true);
+    }
+
+    /**
      * Create the socket object and initiate a connection.
      * This only done for initiating client sockets.
      * A server listener socket client is already connected and must be passed in the constructor.
@@ -234,7 +243,7 @@ export abstract class Client
     }
 
     /**
-     * Base off event procedure responsible for removing a callback from the list of event handlers.
+     * Base "off" event procedure responsible for removing a callback from the list of event handlers.
      *
      * @param {string} event - event name.
      * @param {Function} fn - callback.
@@ -249,7 +258,7 @@ export abstract class Client
     }
 
     /**
-     * Base on event procedure responsible for adding a callback to the list of event handlers.
+     * Base "on" event procedure responsible for adding a callback to the list of event handlers.
      *
      * @param {string} event - event name.
      * @param {Function} fn - callback.
@@ -275,16 +284,22 @@ export abstract class Client
      * @param {string} event - event name.
      * @param {Buffer} [data] - event data.
      * @param {boolean} [doBuffer] - buffers up event data.
+     * @param {boolean} [invertOrder] - used for "unreading" an event and puts it first in the queue (if doBuffer is true)
      *
      */
-    private triggerEvent(event: string, data?: any, doBuffer = false) {
+    private triggerEvent(event: string, data?: any, doBuffer = false, invertOrder = false) {
         const tuple = (this.eventHandlers[event] || [[], []]);
         this.eventHandlers[event] = tuple;
         const [fns, queue] = tuple;
         if (fns.length === 0) {
             if (doBuffer) {
                 // Buffer up the event
-                queue.push(data);
+                if (invertOrder) {
+                    queue.unshift(data);
+                }
+                else {
+                    queue.push(data);
+                }
             }
         }
         else {
