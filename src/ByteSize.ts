@@ -46,8 +46,9 @@ export class ByteSize
 
     protected onClose = () => {
         if (this.reject) {
+            const reject = this.reject;
             this.end();
-            this.reject("Socket closed");
+            reject("Socket closed");
         }
     }
 
