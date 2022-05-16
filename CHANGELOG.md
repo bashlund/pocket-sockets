@@ -1,5 +1,10 @@
 # CHANGELOG: pocket-sockets
 
+## [1.1.0] - 20220516
+Fix timing bug about unreferenced variable.  
+Add ByteSize class to await chunks of incoming data.  
+Add Client.unRead function to be able to put read data back into buffer.  
+
 ## [1.0.1] - 20210928
 Add configuration settings to allow direct import from node modules (npm)
 
