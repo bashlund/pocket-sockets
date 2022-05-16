@@ -1,5 +1,8 @@
 # CHANGELOG: pocket-sockets
 
+## [1.1.1] - 20220516
+Audit npm packages version
+
 ## [1.1.0] - 20220516
 Fix timing bug about unreferenced variable.  
 Add ByteSize class to await chunks of incoming data.  
