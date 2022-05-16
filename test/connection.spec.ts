@@ -18,14 +18,11 @@ export class Connection {
             server.listen();
 
             server.onConnection( (client: Client) => {
-                console.log("Socket accepted");
                 client.onData( (data: Buffer) => {
-                    console.log("Incoming data", data);
                     assert(data.toString() == "hello");
                     client.sendString("received!");
                 });
                 client.onClose( () => {
-                    console.log("client closed");
                     server.close();
                     resolve();
                 });
@@ -39,14 +36,11 @@ export class Connection {
             client.connect();
 
             client.onConnect( () => {
-                console.log("Client connected");
                 client.onData( (data: Buffer) => {
-                    console.log("Incoming data", data);
                     assert(data.toString() == "received!");
                     client.close();
                 });
                 client.onClose( () => {
-                    console.log("client closed");
                 });
                 client.sendString("hello");
             });
