@@ -138,6 +138,6 @@ export class WSClient extends Client
     }
 
     private error = (error: ws.ErrorEvent) => {
-        this.socketError(Buffer.from(error.message));
+        this.socketError(Buffer.from(error.message ? error.message : "Unknown error message"));
     };
 }

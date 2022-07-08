@@ -245,4 +245,44 @@ export class WSClientError {
             assert(flag == true);
         });
     }
+
+    @Test()
+    public onerror_missing_error_message_succeeds() {
+        assert.doesNotThrow(() => {
+            const client = new WSClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            });
+            let flag = false;
+            //@ts-ignore: protected method
+            client.socketError = function(buffer: Buffer) {
+                assert(buffer.toString() == "Unknown error message");
+                flag = true;
+            };
+            //@ts-ignore: ignore missing input check
+            client.error(new Error());
+            //@ts-ignore: flag changes inside custom callback
+            assert(flag == true);
+        });
+    }
+
+    public onerror_undefined_error_succeeds() {
+        assert.doesNotThrow(() => {
+            const client = new WSClient({
+                "host": "host.com",
+                "port": 99,
+                "secure": false,
+            });
+            let flag = false;
+            //@ts-ignore: protected method
+            client.socketError = function(buffer: Buffer) {
+                flag = true;
+            };
+            //@ts-ignore: ignore missing input check
+            client.error();
+            //@ts-ignore: flag changes inside custom callback
+            assert(flag == true);
+        });
+    }
 }
