@@ -1,11 +1,11 @@
 import { TestSuite, Test } from "testyts";
-import {WSClient} from "../index";
-import {WSServer, Client} from "../index";
+import {TCPClient} from "../index";
+import {TCPServer, Client} from "../index";
 
 const assert = require("assert");
 
 @TestSuite()
-export class Connection {
+export class ConnectionTCP {
 
     @Test()
     public async clientserver() {
@@ -14,7 +14,7 @@ export class Connection {
                 host: "localhost",
                 port: 8181
             };
-            const server = new WSServer(serverOptions);
+            const server = new TCPServer(serverOptions);
             server.listen();
 
             server.onConnection( (client: Client) => {
@@ -32,7 +32,7 @@ export class Connection {
                 host: "localhost",
                 port: 8181
             };
-            const client = new WSClient(clientOptions);
+            const client = new TCPClient(clientOptions);
             client.connect();
 
             client.onConnect( () => {
@@ -54,7 +54,7 @@ export class Connection {
                 host: "127.0.0.1",
                 port: 8181
             };
-            const server = new WSServer(serverOptions);
+            const server = new TCPServer(serverOptions);
             server.listen();
 
             server.onConnection( (client: Client) => {
@@ -72,7 +72,7 @@ export class Connection {
                 host: "127.0.0.1",
                 port: 8181
             };
-            const client = new WSClient(clientOptions);
+            const client = new TCPClient(clientOptions);
             client.connect();
 
             client.onConnect( () => {
@@ -94,7 +94,7 @@ export class Connection {
                 host: "::1",
                 port: 8181
             };
-            const server = new WSServer(serverOptions);
+            const server = new TCPServer(serverOptions);
             server.listen();
 
             server.onConnection( (client: Client) => {
@@ -112,7 +112,7 @@ export class Connection {
                 host: "::1",
                 port: 8181
             };
-            const client = new WSClient(clientOptions);
+            const client = new TCPClient(clientOptions);
             client.connect();
 
             client.onConnect( () => {
@@ -134,7 +134,7 @@ export class Connection {
                 host: "0:0:0:0:0:0:0:1",
                 port: 8181
             };
-            const server = new WSServer(serverOptions);
+            const server = new TCPServer(serverOptions);
             server.listen();
 
             server.onConnection( (client: Client) => {
@@ -152,7 +152,7 @@ export class Connection {
                 host: "0:0:0:0:0:0:0:1",
                 port: 8181
             };
-            const client = new WSClient(clientOptions);
+            const client = new TCPClient(clientOptions);
             client.connect();
 
             client.onConnect( () => {
@@ -173,7 +173,7 @@ export class Connection {
             const serverOptions = {
                 port: 8182
             };
-            const server = new WSServer(serverOptions);
+            const server = new TCPServer(serverOptions);
             server.listen();
 
             server.onConnection( (client: Client) => {
@@ -187,7 +187,7 @@ export class Connection {
             const clientOptions = {
                 port: 8182
             };
-            const client = new WSClient(clientOptions);
+            const client = new TCPClient(clientOptions);
             client.connect();
 
             client.onConnect( () => {
