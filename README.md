@@ -58,6 +58,7 @@ For complete examples, please refer to the files under the [./example](https://g
 git clone https://github.com/bashlund/pocket-sockets.git
 cd pocket-sockets
 npm isntall
+cd ./test/cert/ && ./generate_self_signed_cert.sh && cd ../..
 npm test
 ```
 
