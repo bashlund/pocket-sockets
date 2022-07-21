@@ -9,15 +9,16 @@ const fs = require("fs");
 export class ConnectionTLS {
 
     @Test()
-    public async clientserver() {
+    public async clientserver_server_reject_unauthorized() {
         await new Promise(resolve => {
             const serverOptions = {
                 host: "localhost",
                 port: 8181,
                 requestCert: true,
-                rejectUnauthorized: false,
-                cert: fs.readFileSync("./test/cert/test.cert"),
-                key: fs.readFileSync("./test/cert/test.key")
+                rejectUnauthorized: true,
+                cert: fs.readFileSync("./test/cert/localhost.cert"),
+                key: fs.readFileSync("./test/cert/localhost.key"),
+                ca: fs.readFileSync("./test/cert/testCA.pem")
             };
             const server = new WSServer(serverOptions);
             server.listen();
@@ -38,8 +39,157 @@ export class ConnectionTLS {
                 port: 8181,
                 secure: true,
                 rejectUnauthorized: false,
-                cert: fs.readFileSync("./test/cert/test.cert"),
-                key: fs.readFileSync("./test/cert/test.key")
+                cert: fs.readFileSync("./test/cert/testClient.cert"),
+                key: fs.readFileSync("./test/cert/testClient.key"),
+                ca: fs.readFileSync("./test/cert/testCA.pem")
+            };
+            const client = new WSClient(clientOptions);
+            client.connect();
+
+            client.onConnect( () => {
+                client.onData( (data: Buffer) => {
+                    assert(data.toString() == "received!");
+                    client.close();
+                });
+                client.onClose( () => {
+                });
+                client.sendString("hello");
+            });
+        });
+    }
+
+    @Test()
+    public async clientserver_client_reject_unauthorized() {
+        await new Promise(resolve => {
+            const serverOptions = {
+                host: "localhost",
+                port: 8181,
+                requestCert: true,
+                rejectUnauthorized: false,
+                cert: fs.readFileSync("./test/cert/localhost.cert"),
+                key: fs.readFileSync("./test/cert/localhost.key"),
+                ca: fs.readFileSync("./test/cert/testCA.pem")
+            };
+            const server = new WSServer(serverOptions);
+            server.listen();
+
+            server.onConnection( (client: Client) => {
+                client.onData( (data: Buffer) => {
+                    assert(data.toString() == "hello");
+                    client.sendString("received!");
+                });
+                client.onClose( () => {
+                    server.close();
+                    resolve();
+                });
+            });
+
+            const clientOptions = {
+                host: "localhost",
+                port: 8181,
+                secure: true,
+                rejectUnauthorized: true,
+                cert: fs.readFileSync("./test/cert/testClient.cert"),
+                key: fs.readFileSync("./test/cert/testClient.key"),
+                ca: fs.readFileSync("./test/cert/testCA.pem")
+            };
+            const client = new WSClient(clientOptions);
+            client.connect();
+
+            client.onConnect( () => {
+                client.onData( (data: Buffer) => {
+                    assert(data.toString() == "received!");
+                    client.close();
+                });
+                client.onClose( () => {
+                });
+                client.sendString("hello");
+            });
+        });
+    }
+
+    @Test()
+    public async clientserver_reject_unauthorized() {
+        await new Promise(resolve => {
+            const serverOptions = {
+                host: "localhost",
+                port: 8181,
+                requestCert: true,
+                rejectUnauthorized: true,
+                cert: fs.readFileSync("./test/cert/localhost.cert"),
+                key: fs.readFileSync("./test/cert/localhost.key"),
+                ca: fs.readFileSync("./test/cert/testCA.pem")
+            };
+            const server = new WSServer(serverOptions);
+            server.listen();
+
+            server.onConnection( (client: Client) => {
+                client.onData( (data: Buffer) => {
+                    assert(data.toString() == "hello");
+                    client.sendString("received!");
+                });
+                client.onClose( () => {
+                    server.close();
+                    resolve();
+                });
+            });
+
+            const clientOptions = {
+                host: "localhost",
+                port: 8181,
+                secure: true,
+                rejectUnauthorized: true,
+                cert: fs.readFileSync("./test/cert/testClient.cert"),
+                key: fs.readFileSync("./test/cert/testClient.key"),
+                ca: fs.readFileSync("./test/cert/testCA.pem")
+            };
+            const client = new WSClient(clientOptions);
+            client.connect();
+
+            client.onConnect( () => {
+                client.onData( (data: Buffer) => {
+                    assert(data.toString() == "received!");
+                    client.close();
+                });
+                client.onClose( () => {
+                });
+                client.sendString("hello");
+            });
+        });
+    }
+
+    @Test()
+    public async clientserver_allow_unauthorized() {
+        await new Promise(resolve => {
+            const serverOptions = {
+                host: "localhost",
+                port: 8181,
+                requestCert: true,
+                rejectUnauthorized: false,
+                cert: fs.readFileSync("./test/cert/localhost.cert"),
+                key: fs.readFileSync("./test/cert/localhost.key")
+            };
+            const server = new WSServer(serverOptions);
+            server.listen();
+
+            server.onConnection( (client: Client) => {
+                client.onData( (data: Buffer) => {
+                    assert(data.toString() == "hello");
+                    client.sendString("received!");
+                });
+                client.onClose( () => {
+                    server.close();
+                    resolve();
+                });
+            });
+
+            const clientOptions = {
+                host: "localhost",
+                port: 8181,
+                secure: true,
+                rejectUnauthorized: false,
+                cert: fs.readFileSync("./test/cert/testClient.cert"),
+                key: fs.readFileSync("./test/cert/testClient.key")
             };
             const client = new WSClient(clientOptions);
             client.connect();
@@ -64,8 +214,8 @@ export class ConnectionTLS {
                 port: 8181,
                 requestCert: true,
                 rejectUnauthorized: false,
-                cert: fs.readFileSync("./test/cert/test.cert"),
-                key: fs.readFileSync("./test/cert/test.key")
+                cert: fs.readFileSync("./test/cert/localhost.cert"),
+                key: fs.readFileSync("./test/cert/localhost.key")
             };
             const server = new WSServer(serverOptions);
             server.listen();
@@ -86,8 +236,8 @@ export class ConnectionTLS {
                 port: 8181,
                 secure: true,
                 rejectUnauthorized: false,
-                cert: fs.readFileSync("./test/cert/test.cert"),
-                key: fs.readFileSync("./test/cert/test.key")
+                cert: fs.readFileSync("./test/cert/testClient.cert"),
+                key: fs.readFileSync("./test/cert/testClient.key")
             };
             const client = new WSClient(clientOptions);
             client.connect();
@@ -112,8 +262,8 @@ export class ConnectionTLS {
                 port: 8181,
                 requestCert: true,
                 rejectUnauthorized: false,
-                cert: fs.readFileSync("./test/cert/test.cert"),
-                key: fs.readFileSync("./test/cert/test.key")
+                cert: fs.readFileSync("./test/cert/localhost.cert"),
+                key: fs.readFileSync("./test/cert/localhost.key")
             };
             const server = new WSServer(serverOptions);
             server.listen();
@@ -134,8 +284,8 @@ export class ConnectionTLS {
                 port: 8181,
                 secure: true,
                 rejectUnauthorized: false,
-                cert: fs.readFileSync("./test/cert/test.cert"),
-                key: fs.readFileSync("./test/cert/test.key")
+                cert: fs.readFileSync("./test/cert/testClient.cert"),
+                key: fs.readFileSync("./test/cert/testClient.key")
             };
             const client = new WSClient(clientOptions);
             client.connect();
@@ -160,8 +310,8 @@ export class ConnectionTLS {
                 port: 8181,
                 requestCert: true,
                 rejectUnauthorized: false,
-                cert: fs.readFileSync("./test/cert/test.cert"),
-                key: fs.readFileSync("./test/cert/test.key")
+                cert: fs.readFileSync("./test/cert/localhost.cert"),
+                key: fs.readFileSync("./test/cert/localhost.key")
             };
             const server = new WSServer(serverOptions);
             server.listen();
@@ -182,8 +332,8 @@ export class ConnectionTLS {
                 port: 8181,
                 secure: true,
                 rejectUnauthorized: false,
-                cert: fs.readFileSync("./test/cert/test.cert"),
-                key: fs.readFileSync("./test/cert/test.key")
+                cert: fs.readFileSync("./test/cert/testClient.cert"),
+                key: fs.readFileSync("./test/cert/testClient.key")
             };
             const client = new WSClient(clientOptions);
             client.connect();
@@ -207,8 +357,8 @@ export class ConnectionTLS {
                 port: 8182,
                 requestCert: true,
                 rejectUnauthorized: false,
-                cert: fs.readFileSync("./test/cert/test.cert"),
-                key: fs.readFileSync("./test/cert/test.key")
+                cert: fs.readFileSync("./test/cert/localhost.cert"),
+                key: fs.readFileSync("./test/cert/localhost.key")
             };
             const server = new WSServer(serverOptions);
             server.listen();
@@ -225,8 +375,8 @@ export class ConnectionTLS {
                 port: 8182,
                 secure: true,
                 rejectUnauthorized: false,
-                cert: fs.readFileSync("./test/cert/test.cert"),
-                key: fs.readFileSync("./test/cert/test.key")
+                cert: fs.readFileSync("./test/cert/testClient.cert"),
+                key: fs.readFileSync("./test/cert/testClient.key")
             };
             const client = new WSClient(clientOptions);
             client.connect();
