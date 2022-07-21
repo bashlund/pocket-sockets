@@ -4,7 +4,7 @@ A powerful and smooth client/server sockets library for browser and _Node.js_, w
 
 :heavy_check_mark: Written in TypeScript.  
 
-:heavy_check_mark: Support for both _WebSockets_ and regular _TCP_ sockets.  
+:heavy_check_mark: Support for both _WebSockets_ and regular _TCP_ sockets with a unified interface.  
 
 :heavy_check_mark: Works both in _NodeJS_ and browser.  
 

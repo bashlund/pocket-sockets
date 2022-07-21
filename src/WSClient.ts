@@ -10,20 +10,20 @@ import * as ws from "ws";
 
 let isBrowser: boolean;
 let WebSocketClass: any = null;
-// @ts-ignore
+//@ts-ignore
 if (typeof WebSocket !== "undefined") {
     isBrowser = true;
-// @ts-ignore
+    //@ts-ignore
     WebSocketClass = WebSocket;
-// @ts-ignore
+//@ts-ignore
 } else if (typeof MozWebSocket !== "undefined") {
     isBrowser = true;
-// @ts-ignore
+    //@ts-ignore
     WebSocketClass = MozWebSocket;
-// @ts-ignore
+//@ts-ignore
 } else if (typeof window !== "undefined") {
     isBrowser = true;
-// @ts-ignore
+    //@ts-ignore
     WebSocketClass = window.WebSocket || window.MozWebSocket;
 } else {
     isBrowser = false;
@@ -44,6 +44,54 @@ export class WSClient extends Client
 
         if (this.socket) {
             this.socketHook();
+        }
+    }
+
+    /**
+     * Note this does always return undefined in browser.
+     * @return {string | undefined} local IP address
+     */
+    public getLocalAddress(): string | undefined {
+        //@ts-ignore
+        if (this.socket?._socket && typeof this.socket._socket.localAddress === "string") {
+            //@ts-ignore
+            return this.socket._socket.localAddress;
+        }
+    }
+
+    /**
+     * Note this does always return undefined in browser.
+     * @return {string | undefined} remote IP address
+     */
+    public getRemoteAddress(): string | undefined {
+        //@ts-ignore
+        if (this.socket?._socket && typeof this.socket._socket.remoteAddress === "string") {
+            //@ts-ignore
+            return this.socket._socket.remoteAddress;
+        }
+    }
+
+    /**
+     * Note this does always return undefined in browser.
+     * @return {number | undefined} remote port
+     */
+    public getRemotePort(): number | undefined {
+        //@ts-ignore
+        if (this.socket?._socket && typeof this.socket._socket.remotePort === "number") {
+            //@ts-ignore
+            return this.socket._socket.remotePort;
+        }
+    }
+
+    /**
+     * Note this does always return undefined in browser.
+     * @return {number | undefined} local port
+     */
+    public getLocalPort(): number | undefined {
+        //@ts-ignore
+        if (this.socket?._socket && typeof this.socket._socket.localPort === "number") {
+            //@ts-ignore
+            return this.socket._socket.localPort;
         }
     }
 
