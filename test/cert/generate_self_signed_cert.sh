@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/usr/bin/env sh
 
 SUBJECT=/C=SE/ST=Unknown/L=Stockholm/O=PocketSocketsTestCA
 
