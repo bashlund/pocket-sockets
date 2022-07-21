@@ -25,7 +25,7 @@ export type ClientOptions = {
     secure?: boolean,
 
     /**
-     * If true (defualt) the client will reject any server certificate which is
+     * If true (default) the client will reject any server certificate which is
      * not approved by the trusted or the supplied list of CAs in the ca property.
      */
     rejectUnauthorized?: boolean,
@@ -86,7 +86,7 @@ export type ServerOptions = {
     requestCert?: boolean,
 
     /**
-     * If true (defualt) the server will reject any client certificate which is
+     * If true (default) the server will reject any client certificate which is
      * not approved by the trusted or the supplied list of CAs in the ca property.
      * This option only has effect if requestCert is set to true.
      */
