@@ -40,6 +40,7 @@ export type ClientOptions = {
     /**
      * Client private key in PEM format.
      * Required if cert is set.
+     * Note that the type string[] is not supported.
      */
     key?: string | Buffer | Buffer[],
 
@@ -102,6 +103,7 @@ export type ServerOptions = {
     /**
      * Server private keys in PEM format.
      * Required if cert is set.
+     * Note that the type string[] is not supported.
      */
     key?: string | Buffer | Buffer[],
 
@@ -110,4 +112,52 @@ export type ServerOptions = {
      * client self signed certificates.
      */
     ca?: string | string[] | Buffer | Buffer[],
+};
+
+export type SocketFactoryStats = {
+    counters: {[key: string]: {counter: number}},
+};
+
+export type SocketFactoryConfig = {
+    /**
+     * This must be set if factory is to connect as a client.
+     * Both client and server can bet set together.
+     */
+    client?: {
+        socketType: "WebSocket" | "TCP",
+
+        clientOptions: ClientOptions,
+
+        /** If set greater than 0 wait as many seconds to reconnect a closed client. */
+        reconnectDelay?: number,
+    },
+
+    /**
+     * This must be set if factory is to connect as a server.
+     * Both client and server can bet set together.
+     */
+    server?: {
+        socketType: "WebSocket" | "TCP",
+
+        serverOptions: ServerOptions,
+
+        /** If client IP is in the array then the connection will be disallowed and disconnected. Lowercase strings are required. */
+        deniedIPs: string[],
+
+        /** If set then the client IP must be within the array to be allowed to connect. Lowercase strings are required. */
+        allowedIPs: string[],
+    },
+
+    /** Total allowed number of socket connections for the factory. */
+    maxConnections?: number,
+
+    /**
+     * Max connections per remote IP for the factory.
+     * Note that when sharing this state between server and client sockets
+     * it is important that the client `host` field is the remote IP address,
+     * the same IP address as read from the socket when server is accepting it.
+     * If the client is using a hostname as `host` then the shared counting will not be correct,
+     * since hostname and clientIP will not match.
+     */
+    maxConnectionsPerIp?: number,
 };
