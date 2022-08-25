@@ -30,15 +30,19 @@ export abstract class Server
     }
 
     /**
-     * Close listener and all accepted socket clients.
+     * Close listener and optionally (default) also all accepted socket clients.
+     * @param closeClients if set to true (default) then also close all accepted sockets,
+     * if set to false then leave accepted client sockets open.
      */
-    public close() {
+    public close(closeClients: boolean = true) {
         if (this.isClosed) {
             return;
         }
         this.serverClose();
-        this.clients.forEach( client => client.close() );
-        this.clients = [];
+        if (closeClients) {
+            this.clients.forEach( client => client.close() );
+            this.clients = [];
+        }
     }
 
     /**
