@@ -1,10 +1,19 @@
 import {Client} from "./Client";
 
-class VirtualClient extends Client
+/**
+ * A mock client socket which can be used for simulating regular socket communications.
+ * This allows to have the same interface when working with sockets but when not needing
+ * the actual socket because both parties are in the same process.
+ */
+export class VirtualClient extends Client
 {
-    pairedSocket?: VirtualClient;
-    latency: number;
-    outQueue: Buffer[];
+    protected pairedSocket?: VirtualClient;
+    protected latency: number;
+    protected outQueue: Buffer[];
+    protected remoteAddress: string | undefined;
+    protected localAddress: string | undefined;
+    protected remotePort: number | undefined;
+    protected localPort: number | undefined;
 
     /**
      * @constructor
@@ -33,6 +42,20 @@ class VirtualClient extends Client
     }
 
     /**
+     * Pair this socket with given socket and emit connected events on this socket and then on given socket.
+     * @param pairedSocket the client to pair this client with.
+     */
+    public pair(pairedSocket: VirtualClient) {
+        if (this.pairedSocket) {
+            throw "Socket can only be paired once.";
+        }
+        this.pairedSocket = pairedSocket;
+        this.pairedSocket.pairedSocket = this;
+        this.socketConnected();
+        this.pairedSocket.pairedSocket.socketConnected();
+    }
+
+    /**
      * Set a simulated latency of the socket communications.
      *
      * @param {number} latency in milliseconds for each send
@@ -42,6 +65,38 @@ class VirtualClient extends Client
             throw "Cannot decrease latency while data is still waiting to send.";
         }
         this.latency = latency;
+    }
+
+    public setLocalAddress(localAddress: string | undefined) {
+        this.localAddress = localAddress;
+    }
+
+    public setRemoteAddress(remoteAddress: string | undefined) {
+        this.remoteAddress = remoteAddress;
+    }
+
+    public setRemotePort(remotePort: number | undefined) {
+        this.remotePort = remotePort;
+    }
+
+    public setLocalPort(localPort: number | undefined) {
+        this.localPort = localPort;
+    }
+
+    public getLocalAddress(): string | undefined {
+        return this.localAddress;
+    }
+
+    public getRemoteAddress(): string | undefined {
+        return this.remoteAddress;
+    }
+
+    public getRemotePort(): number | undefined {
+        return this.remotePort;
+    }
+
+    public getLocalPort(): number | undefined {
+        return this.localPort;
     }
 
     /**
@@ -93,6 +148,10 @@ class VirtualClient extends Client
     }
 }
 
+/**
+ * Create two paired virtual clients.
+ * @returns tuple of two clients.
+ */
 export function CreatePair(): [VirtualClient, VirtualClient] {
     const socket1 = new VirtualClient();
     const socket2 = new VirtualClient(socket1);
