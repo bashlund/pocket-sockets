@@ -145,7 +145,7 @@ export type SocketFactoryConfig = {
         deniedIPs: string[],
 
         /** If set then the client IP must be within the array to be allowed to connect. Lowercase strings are required. */
-        allowedIPs: string[],
+        allowedIPs?: string[],
     },
 
     /** Total allowed number of socket connections for the factory. */

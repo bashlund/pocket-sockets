@@ -313,8 +313,8 @@ export class SocketFactory {
     }
 
     protected isAllowed(key: string): boolean {
-        const allowedIPs = this.config.server?.allowedIPs || [];
-        if (allowedIPs.length === 0) {
+        const allowedIPs = this.config.server?.allowedIPs;
+        if (!allowedIPs) {
             return true;
         }
         return allowedIPs.includes(key.toLowerCase());
