@@ -32,7 +32,7 @@ import {
 } from "./types";
 
 /**
- * THis error event is always emitted in addition to every specific error event.
+ * This error event is always emitted in addition to every specific error event.
  * It is a good catch-all error event handler.
  * @param type is the name of the specific error event which was emitted.
  * @param error is the error the specific error event emitted.
@@ -195,6 +195,10 @@ export class SocketFactory {
             const error = new Error(buf.toString());
             this.triggerEvent(SocketFactory.EVENT_CLIENT_CONNECT_ERROR, error);
             this.triggerEvent(SocketFactory.EVENT_ERROR, {type: SocketFactory.EVENT_CLIENT_CONNECT_ERROR, error});
+            if (this.config.client?.reconnectDelay ?? 0 > 0) {
+                const delay = this.config.client!.reconnectDelay! * 1000;
+                setTimeout( () => this.connectClient(), delay);
+            }
         });
         socket.onConnect( () => {
             if (!socket || !this.config.client) {
