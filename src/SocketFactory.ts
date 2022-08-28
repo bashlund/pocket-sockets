@@ -32,16 +32,59 @@ import {
 } from "./types";
 
 /**
+ * A map over all events emitted from this SocketFactory.
+ * The ERROR events is special that it is emitted together with a specific error event.
+ */
+export const EVENTS = {
+    ERROR: {
+        name: "ERROR",
+        /* These are the names of the events which also are emitted as ERROR events. */
+        subEvents: [
+            "CLIENT_INIT_ERROR",
+            "CLIENT_CONNECT_ERROR",
+            "SERVER_INIT_ERROR",
+            "SERVER_LISTEN_ERROR",
+        ],
+    },
+    CLIENT_INIT_ERROR: {
+        name: "CLIENT_INIT_ERROR",
+    },
+    CLIENT_CONNECT_ERROR: {
+        name: "CLIENT_CONNECT_ERROR",
+    },
+    CLOSE: {
+        name: "CLOSE",
+    },
+    CONNECT: {
+        name: "CONNECT",
+    },
+    SERVER_INIT_ERROR: {
+        name: "SERVER_INIT_ERROR",
+    },
+    SERVER_LISTEN_ERROR: {
+        name: "SERVER_LISTEN_ERROR",
+    },
+    CLIENT_REFUSE: {
+        name: "CLIENT_REFUSE",
+        reason: {
+            IP_DENIED: "IP_DENIED",
+            IP_NOT_ALLOWED: "IP_NOT_ALLOWED",
+            IP_OVERFLOW: "IP_OVERFLOW",
+        },
+    },
+};
+
+/**
  * This error event is always emitted in addition to every specific error event.
  * It is a good catch-all error event handler.
- * @param type is the name of the specific error event which was emitted.
- * @param error is the error the specific error event emitted.
- * @param data is event type dependant extra data set which also was set in the specific error event.
+ * @param e.subEvent is the name of the specific error event which was emitted.
+ * These options are in EVENTS.ERROR.subEvents list.
+ * @param e.e is the original event parameter(s) passed on in an object.
  */
-export type ErrorCallback = (e: {type: string, error: Error, data?: any}) => void;
+export type ErrorCallback = (e: {subEvent: string, e: object}) => void;
 
 /** Event emitted when client socket cannot be initaited, likely due to misconfiguration. */
-export type ClientInitErrorCallback = (error: Error) => void;
+export type ClientInitErrorCallback = (e: {error: Error}) => void;
 
 /** Event emitted when client socket cannot connect to server. */
 export type ClientConnectErrorCallback = (error: Error) => void;
@@ -60,11 +103,9 @@ export type ServerListenErrorCallback = (error: Error) => void;
 
 /**
  * Event emitted when server actively refused the client's IP address.
- * @type is SocketFactory.EVENT_CLIENT_REFUSE_IP_DENIED |
- * SocketFactory.EVENT_CLIENT_REFUSE_IP_NOT_ALLOWED |
- * SocketFactory.EVENT_CLIENT_REFUSE_IP_OVERFLOW.
+ * @reason is found in EVENTS.CLIENT_REFUSE.reason
  */
-export type ClientRefuseCallback = (e: {type: string, key: string}) => void;
+export type ClientRefuseCallback = (e: {reason: string, key: string}) => void;
 
 /**
  * A SocketFactory emits connected sockets.
@@ -85,18 +126,6 @@ export type ClientRefuseCallback = (e: {type: string, key: string}) => void;
  * importantly that a client SocketFactory can share stats within and with other factories to avoid redundant connections.
  */
 export class SocketFactory {
-    public static readonly EVENT_ERROR                       = "error";
-    public static readonly EVENT_CLIENT_INIT_ERROR           = "clientInitError";
-    public static readonly EVENT_CLIENT_CONNECT_ERROR        = "clientConnectError";
-    public static readonly EVENT_CLOSE                       = "close";
-    public static readonly EVENT_CONNECT                     = "connect";
-    public static readonly EVENT_SERVER_INIT_ERROR           = "serverInitError";
-    public static readonly EVENT_SERVER_LISTEN_ERROR         = "serverListenError";
-    public static readonly EVENT_CLIENT_REFUSE               = "clientRefuse";
-    public static readonly EVENT_CLIENT_REFUSE_IP_OVERFLOW   = "IP-overflow";
-    public static readonly EVENT_CLIENT_REFUSE_IP_DENIED     = "IP-denied";
-    public static readonly EVENT_CLIENT_REFUSE_IP_NOT_ALLOWED = "IP-not-allowed";
-
     protected config: SocketFactoryConfig;
     protected stats: SocketFactoryStats;
     protected handlers: {[type: string]: Function[]};
@@ -158,8 +187,8 @@ export class SocketFactory {
             this.clientSocket = this.createClientSocket();
         }
         catch(error) {
-            this.triggerEvent(SocketFactory.EVENT_CLIENT_INIT_ERROR, error);
-            this.triggerEvent(SocketFactory.EVENT_ERROR, {type: SocketFactory.EVENT_CLIENT_INIT_ERROR, error});
+            this.triggerEvent(EVENTS.CLIENT_INIT_ERROR.name, {error});
+            this.triggerEvent(EVENTS.ERROR.name, {subEvent: EVENTS.CLIENT_INIT_ERROR, e: {error}});
             return;
         }
 
@@ -193,8 +222,8 @@ export class SocketFactory {
                 delete this.clientSocket;
             }
             const error = new Error(buf.toString());
-            this.triggerEvent(SocketFactory.EVENT_CLIENT_CONNECT_ERROR, error);
-            this.triggerEvent(SocketFactory.EVENT_ERROR, {type: SocketFactory.EVENT_CLIENT_CONNECT_ERROR, error});
+            this.triggerEvent(EVENTS.CLIENT_CONNECT_ERROR.name, {error});
+            this.triggerEvent(EVENTS.ERROR.name, {subEvent: EVENTS.CLIENT_CONNECT_ERROR.name, e: {error}});
             if (this.config.client?.reconnectDelay ?? 0 > 0) {
                 const delay = this.config.client!.reconnectDelay! * 1000;
                 setTimeout( () => this.connectClient(), delay);
@@ -219,14 +248,14 @@ export class SocketFactory {
                     delete this.clientSocket;
                 }
                 this.decreaseConnectionsCounter(this.config.client.clientOptions.host ?? "localhost");
-                this.triggerEvent(SocketFactory.EVENT_CLOSE, {client: socket, isServer: false, hadError});
+                this.triggerEvent(EVENTS.CLOSE.name, {client: socket, isServer: false, hadError});
                 if (this.config.client?.reconnectDelay ?? 0 > 0) {
                     const delay = this.config.client!.reconnectDelay! * 1000;
                     setTimeout( () => this.connectClient(), delay);
                 }
             });
             this.increaseConnectionsCounter(this.config.client.clientOptions.host ?? "localhost");
-            this.triggerEvent(SocketFactory.EVENT_CONNECT, {client: socket, isServer: false});
+            this.triggerEvent(EVENTS.CONNECT.name, {client: socket, isServer: false});
         });
         socket.connect();
     }
@@ -240,8 +269,8 @@ export class SocketFactory {
             this.serverSocket = this.createServerSocket();
         }
         catch(error) {
-            this.triggerEvent(SocketFactory.EVENT_SERVER_INIT_ERROR, error);
-            this.triggerEvent(SocketFactory.EVENT_ERROR, {type: SocketFactory.EVENT_SERVER_INIT_ERROR, error});
+            this.triggerEvent(EVENTS.SERVER_INIT_ERROR.name, {error});
+            this.triggerEvent(EVENTS.ERROR.name, {subEvent: EVENTS.SERVER_INIT_ERROR.name, e: {error}});
             return;
         }
 
@@ -277,17 +306,20 @@ export class SocketFactory {
             if (clientIP) {
                 if (this.isDenied(clientIP)) {
                     socket.close();
-                    this.triggerEvent(SocketFactory.EVENT_CLIENT_REFUSE, {type: SocketFactory.EVENT_CLIENT_REFUSE_IP_DENIED, key: clientIP});
+                    this.triggerEvent(EVENTS.CLIENT_REFUSE.name,
+                                      {reason: EVENTS.CLIENT_REFUSE.reason.IP_DENIED, key: clientIP});
                     return;
                 }
                 if (!this.isAllowed(clientIP)) {
                     socket.close();
-                    this.triggerEvent(SocketFactory.EVENT_CLIENT_REFUSE, {type: SocketFactory.EVENT_CLIENT_REFUSE_IP_NOT_ALLOWED, key: clientIP});
+                    this.triggerEvent(EVENTS.CLIENT_REFUSE.name,
+                                      {reason: EVENTS.CLIENT_REFUSE.reason.IP_NOT_ALLOWED, key: clientIP});
                     return;
                 }
                 if (this.checkConnectionsOverflow(clientIP)) {
                     socket.close();
-                    this.triggerEvent(SocketFactory.EVENT_CLIENT_REFUSE, {type: SocketFactory.EVENT_CLIENT_REFUSE_IP_OVERFLOW, key: clientIP});
+                    this.triggerEvent(EVENTS.CLIENT_REFUSE.name,
+                                      {reason: EVENTS.CLIENT_REFUSE.reason.IP_OVERFLOW, key: clientIP});
                     return;
                 }
                 this.increaseConnectionsCounter(clientIP);
@@ -299,14 +331,14 @@ export class SocketFactory {
                 this.serverClientSockets = this.serverClientSockets.filter( (socket2: Client) => {
                     return socket !== socket2;
                 });
-                this.triggerEvent(SocketFactory.EVENT_CLOSE, {client: socket, isServer: true, hadError});
+                this.triggerEvent(EVENTS.CLOSE.name, {client: socket, isServer: true, hadError});
             });
-            this.triggerEvent(SocketFactory.EVENT_CONNECT, {client: socket, isServer: true});
+            this.triggerEvent(EVENTS.CONNECT.name, {client: socket, isServer: true});
         });
         this.serverSocket.onError( (buf: Buffer) => {
             const error = new Error(buf.toString());
-            this.triggerEvent(SocketFactory.EVENT_SERVER_LISTEN_ERROR, error);
-            this.triggerEvent(SocketFactory.EVENT_ERROR, {type: SocketFactory.EVENT_SERVER_LISTEN_ERROR, error});
+            this.triggerEvent(EVENTS.SERVER_LISTEN_ERROR.name, {error});
+            this.triggerEvent(EVENTS.ERROR.name, {subEvent: EVENTS.SERVER_LISTEN_ERROR.name, e: {error}});
         });
         this.serverSocket.listen();
     }
@@ -438,7 +470,7 @@ export class SocketFactory {
      * @param callback
      */
     public onError(callback: ErrorCallback) {
-        this.hookEvent(SocketFactory.EVENT_ERROR, callback);
+        this.hookEvent(EVENTS.ERROR.name, callback);
     }
 
     /**
@@ -446,7 +478,7 @@ export class SocketFactory {
      * @param callback
      */
     public onServerInitError(callback: ServerInitErrorCallback) {
-        this.hookEvent(SocketFactory.EVENT_SERVER_INIT_ERROR, callback);
+        this.hookEvent(EVENTS.SERVER_INIT_ERROR.name, callback);
     }
 
     /**
@@ -454,7 +486,7 @@ export class SocketFactory {
      * @param callback
      */
     public onServerListenError(callback: ServerListenErrorCallback) {
-        this.hookEvent(SocketFactory.EVENT_SERVER_LISTEN_ERROR, callback);
+        this.hookEvent(EVENTS.SERVER_LISTEN_ERROR.name, callback);
     }
 
     /**
@@ -463,7 +495,7 @@ export class SocketFactory {
      * @param callback
      */
     public onClientInitError(callback: ClientInitErrorCallback) {
-        this.hookEvent(SocketFactory.EVENT_CLIENT_INIT_ERROR, callback);
+        this.hookEvent(EVENTS.CLIENT_INIT_ERROR.name, callback);
     }
 
     /**
@@ -471,7 +503,7 @@ export class SocketFactory {
      * @param callback
      */
     public onConnectError(callback: ClientConnectErrorCallback) {
-        this.hookEvent(SocketFactory.EVENT_CLIENT_CONNECT_ERROR, callback);
+        this.hookEvent(EVENTS.CLIENT_CONNECT_ERROR.name, callback);
     }
 
     /**
@@ -479,7 +511,7 @@ export class SocketFactory {
      * @param callback
      */
     public onConnect(callback: ConnectCallback) {
-        this.hookEvent(SocketFactory.EVENT_CONNECT, callback);
+        this.hookEvent(EVENTS.CONNECT.name, callback);
     }
 
     /**
@@ -488,7 +520,7 @@ export class SocketFactory {
      * @param callback
      */
     public onClose(callback: CloseCallback) {
-        this.hookEvent(SocketFactory.EVENT_CLOSE, callback);
+        this.hookEvent(EVENTS.CLOSE.name, callback);
     }
 
     /**
@@ -496,7 +528,7 @@ export class SocketFactory {
      * @param callback
      */
     public onRefusedClientConnection(callback: ClientRefuseCallback) {
-        this.hookEvent(SocketFactory.EVENT_CLIENT_REFUSE, callback);
+        this.hookEvent(EVENTS.CLIENT_REFUSE.name, callback);
     }
 
     protected hookEvent(type: string, callback: Function) {
