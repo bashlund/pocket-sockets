@@ -1,6 +1,14 @@
 import { TestSuite, Test } from "testyts";
 import {SocketFactory} from "../src/SocketFactory";
 
+import {
+    WSClient,
+} from "../src/WSClient";
+
+import {
+    TCPClient,
+} from "../src/TCPClient";
+
 const assert = require("assert");
 
 @TestSuite()
@@ -480,4 +488,431 @@ export class SocketFactoryConnectClient {
             assert(initClientSocketCalled == false);
         });
     }
+}
+
+@TestSuite()
+export class SocketFactoryCreateClientSocket {
+    @Test()
+    public successful_call_websocket() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "WebSocket",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                }
+            });
+            //@ts-ignore
+            const socket = socketFactory.createClientSocket();
+            assert(socket!.clientOptions!.host == "host.com");
+            assert(socket!.clientOptions!.port == 99);
+            assert(socket instanceof WSClient);
+        });
+    }
+
+    @Test()
+    public successful_call_tcp() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "TCP",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                }
+            });
+            //@ts-ignore
+            const socket = socketFactory.createClientSocket();
+            assert(socket!.clientOptions!.host == "host.com");
+            assert(socket!.clientOptions!.port == 99);
+            assert(socket instanceof TCPClient);
+        });
+    }
+
+    @Test()
+    public misconfigured_socketType() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    //@ts-ignore
+                    socketType: "BADTYPE",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                }
+            });
+            assert.throws(() => {
+                //@ts-ignore
+                const socket = socketFactory.createClientSocket();
+            }, /Error: Misconfiguration/);
+        });
+    }
+
+    @Test()
+    public missing_socketType() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                //@ts-ignore
+                client: {
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                }
+            });
+            assert.throws(() => {
+                //@ts-ignore
+                const socket = socketFactory.createClientSocket();
+            }, /Error: Misconfiguration/);
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryInitClientSocket {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "WebSocket",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                }
+            });
+            let onErrorCalled = false;
+            let onConnectCalled = false;
+            let connectCalled = false;
+            //@ts-ignore
+            socketFactory.clientSocket = {
+                onError: function() {
+                    onErrorCalled = true;
+                },
+                onConnect: function() {
+                    onConnectCalled = true;
+                },
+                connect: function() {
+                    connectCalled = true;
+                },
+            };
+            //@ts-ignore
+            socketFactory.initClientSocket();
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(onErrorCalled == true);
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(onConnectCalled == true);
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(connectCalled == true);
+        });
+    }
+
+    @Test()
+    public undefined_clientSocket() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "WebSocket",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                }
+            });
+            let onErrorCalled = false;
+            let onConnectCalled = false;
+            let connectCalled = false;
+            //@ts-ignore
+            socketFactory.clientSocket = {
+                onError: function() {
+                    onErrorCalled = true;
+                },
+                onConnect: function() {
+                    onConnectCalled = true;
+                },
+                connect: function() {
+                    connectCalled = true;
+                },
+            };
+            //@ts-ignore
+            socketFactory.clientSocket = null;
+            //@ts-ignore
+            socketFactory.initClientSocket();
+            assert(onErrorCalled == false);
+            assert(onConnectCalled == false);
+            assert(connectCalled == false);
+        });
+    }
+
+    @Test()
+    public successful_call_onerror() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "WebSocket",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                }
+            });
+
+            //@ts-ignore
+            socketFactory.triggerEvent = function(name, args) {
+                assert(name == "CLIENT_CONNECT_ERROR" || name == "ERROR");
+                if(args.e && args.e.error) {
+                    assert(args.e.error.message == "test");
+                } else {
+                    assert(args.error.message == "test");
+                }
+            };
+
+            let onErrorCalled = false;
+            let onConnectCalled = false;
+            let connectCalled = false;
+            //@ts-ignore
+            socketFactory.clientSocket = {
+                onError: function(fn) {
+                    onErrorCalled = true;
+                    //@ts-ignore
+                    assert(socketFactory.clientSocket)
+                    fn("test");
+                    //@ts-ignore
+                    assert(!socketFactory.clientSocket)
+                },
+                onConnect: function() {
+                    onConnectCalled = true;
+                },
+                connect: function() {
+                    connectCalled = true;
+                },
+            };
+            //@ts-ignore
+            socketFactory.initClientSocket();
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(onErrorCalled == true);
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(onConnectCalled == true);
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(connectCalled == true);
+        });
+    }
+
+    @Test()
+    public successful_call_onerror_without_clientSocket() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "WebSocket",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                }
+            });
+
+            //@ts-ignore
+            socketFactory.triggerEvent = function(name, args) {
+                assert(name == "CLIENT_CONNECT_ERROR" || name == "ERROR");
+                if(args.e && args.e.error) {
+                    assert(args.e.error.message == "test");
+                } else {
+                    assert(args.error.message == "test");
+                }
+            };
+
+            let onErrorCalled = false;
+            let onConnectCalled = false;
+            let connectCalled = false;
+            //@ts-ignore
+            socketFactory.clientSocket = {
+                onError: function(fn) {
+                    onErrorCalled = true;
+                    //@ts-ignore
+                    socketFactory.clientSocket = null;
+                    fn("test");
+                    //@ts-ignore
+                    assert(!socketFactory.clientSocket)
+                },
+                onConnect: function() {
+                    onConnectCalled = true;
+                },
+                connect: function() {
+                    connectCalled = true;
+                },
+            };
+            //@ts-ignore
+            socketFactory.initClientSocket();
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(onErrorCalled == true);
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(onConnectCalled == true);
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(connectCalled == true);
+        });
+    }
+
+    @Test()
+    public successful_call_onconnect() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "WebSocket",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                }
+            });
+
+            //@ts-ignore
+            socketFactory.triggerEvent = function(name, args) {
+                assert(name == "CLIENT_CONNECT_ERROR" || name == "ERROR");
+                if(args.e && args.e.error) {
+                    assert(args.e.error.message == "test");
+                } else {
+                    assert(args.error.message == "test");
+                }
+            };
+
+            //@ts-ignore
+            socketFactory.checkConnectionsOverflow = function() {
+                return false;
+            };
+            //@ts-ignore
+            socketFactory.increaseConnectionsCounter = function(host) {
+                assert(host == "host.com");
+            };
+            //@ts-ignore
+            socketFactory.triggerEvent = function(name, args) {
+                assert(name == "ERROR" || name == "CONNECT");
+                assert(args.isServer == false);
+            };
+
+            let onErrorCalled = false;
+            let onConnectCalled = false;
+            let connectCalled = false;
+            let onCloseCalled = false;
+            //@ts-ignore
+            socketFactory.clientSocket = {
+                onError: function() {
+                    onErrorCalled = true;
+                },
+                onConnect: function(fn) {
+                    onConnectCalled = true;
+                    //@ts-ignore
+                    assert(socketFactory.clientSocket)
+                    //@ts-ignore
+                    socketFactory.clientSocket.onClose = function(fn) {
+                        onCloseCalled = true;
+                    };
+                    fn("test");
+                },
+                connect: function() {
+                    connectCalled = true;
+                },
+            };
+            //@ts-ignore
+            socketFactory.initClientSocket();
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(onErrorCalled == true);
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(onConnectCalled == true);
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(connectCalled == true);
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(onCloseCalled == true);
+        });
+    }
+
+    @Test()
+    public successful_call_onconnect_connectionsOverflow() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "WebSocket",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                }
+            });
+
+            //@ts-ignore
+            socketFactory.triggerEvent = function(name, args) {
+                assert(name == "CLIENT_CONNECT_ERROR" || name == "ERROR");
+                if(args.e && args.e.error) {
+                    assert(args.e.error.message == "test");
+                } else {
+                    assert(args.error.message == "test");
+                }
+            };
+
+            //@ts-ignore
+            socketFactory.checkConnectionsOverflow = function() {
+                return true;
+            };
+            //@ts-ignore
+            socketFactory.increaseConnectionsCounter = function(host) {
+                assert(host == "host.com");
+            };
+            //@ts-ignore
+            socketFactory.triggerEvent = function(name, args) {
+                assert(name == "ERROR" || name == "CONNECT");
+                assert(args.isServer == false);
+            };
+
+            let onErrorCalled = false;
+            let onConnectCalled = false;
+            let connectCalled = false;
+            let onCloseCalled = false;
+            //@ts-ignore
+            socketFactory.clientSocket = {
+                onError: function() {
+                    onErrorCalled = true;
+                },
+                onClose: function() {
+                    onCloseCalled = true;
+                },
+                onConnect: function(fn) {
+                    onConnectCalled = true;
+                    //@ts-ignore
+                    assert(socketFactory.clientSocket)
+                    let closeCalled = false;
+                    //@ts-ignore
+                    socketFactory.clientSocket.close = function(fn) {
+                        closeCalled = true;
+                    };
+                    fn("test");
+                    //@ts-ignore
+                    assert(closeCalled == true);
+                },
+                connect: function() {
+                    connectCalled = true;
+                },
+            };
+            //@ts-ignore
+            socketFactory.initClientSocket();
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(onErrorCalled == true);
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(onConnectCalled == true);
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(connectCalled == true);
+            //@ts-ignore: static analysis unable to catch state mutation
+            //assert(onCloseCalled == true);
+        });
+    }
+
 }
