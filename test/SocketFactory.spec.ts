@@ -9,6 +9,10 @@ import {
     TCPClient,
 } from "../src/TCPClient";
 
+import {
+    TCPServer,
+} from "../src/TCPServer";
+
 const assert = require("assert");
 
 @TestSuite()
@@ -914,5 +918,226 @@ export class SocketFactoryInitClientSocket {
             //assert(onCloseCalled == true);
         });
     }
+}
 
+@TestSuite()
+export class SocketFactoryOpenServer {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "TCP",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                }
+            });
+
+            //@ts-ignore: NOOP
+            socketFactory.createServerSocket = function() {
+            };
+
+            let initServerSocketCalled = false;
+            //@ts-ignore
+            socketFactory.initServerSocket = function() {
+                initServerSocketCalled = true;
+            };
+
+            //@ts-ignore
+            assert(!socketFactory.serverSocket);
+            //@ts-ignore
+            assert(!socketFactory._isClosed);
+            //@ts-ignore
+            assert(!socketFactory._isShutdown);
+            //@ts-ignore
+            assert(socketFactory.config.server);
+            //@ts-ignore
+            assert(!socketFactory.serverSocket);
+            //@ts-ignore
+            socketFactory.openServer();
+
+            //@ts-ignore: static analysis unable to catch state mutation
+            assert(initServerSocketCalled == true);
+        });
+    }
+
+    @Test()
+    public isClosed() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "TCP",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                }
+            });
+
+            let createServerSocketCalled = false;
+            //@ts-ignore
+            socketFactory.createServerSocket = function() {
+                createServerSocketCalled = true;
+            };
+
+            let initServerSocketCalled = false;
+            //@ts-ignore
+            socketFactory.initServerSocket = function() {
+                initServerSocketCalled = true;
+            };
+
+            socketFactory.close();
+            //@ts-ignore
+            socketFactory.openServer();
+
+            assert(createServerSocketCalled == false);
+            assert(initServerSocketCalled == false);
+        });
+    }
+
+    @Test()
+    public isShutdown() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "TCP",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                }
+            });
+
+            let createServerSocketCalled = false;
+            //@ts-ignore
+            socketFactory.createServerSocket = function() {
+                createServerSocketCalled = true;
+            };
+
+            let initServerSocketCalled = false;
+            //@ts-ignore
+            socketFactory.initServerSocket = function() {
+                initServerSocketCalled = true;
+            };
+
+            socketFactory.shutdown();
+            //@ts-ignore
+            socketFactory.openServer();
+
+            assert(createServerSocketCalled == false);
+            assert(initServerSocketCalled == false);
+        });
+    }
+
+    @Test()
+    public missing_config_server() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+            });
+
+            let createServerSocketCalled = false;
+            //@ts-ignore
+            socketFactory.createServerSocket = function() {
+                createServerSocketCalled = true;
+            };
+
+            let initServerSocketCalled = false;
+            //@ts-ignore
+            socketFactory.initServerSocket = function() {
+                initServerSocketCalled = true;
+            };
+
+            //@ts-ignore
+            socketFactory.openServer();
+
+            assert(createServerSocketCalled == false);
+            assert(initServerSocketCalled == false);
+        });
+    }
+
+    @Test()
+    public serverSocket_already_set() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "TCP",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                }
+            });
+
+            let createServerSocketCalled = false;
+            //@ts-ignore
+            socketFactory.createServerSocket = function() {
+                createServerSocketCalled = true;
+            };
+
+            let initServerSocketCalled = false;
+            //@ts-ignore
+            socketFactory.initServerSocket = function() {
+                initServerSocketCalled = true;
+            };
+
+            //@ts-ignore
+            socketFactory.serverSocket = new TCPServer(socketFactory.config.server.serverOptions);
+            //@ts-ignore
+            socketFactory.openServer();
+
+            assert(createServerSocketCalled == false);
+            assert(initServerSocketCalled == false);
+        });
+    }
+
+    @Test()
+    public createServerSocket_throws() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "TCP",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                }
+            });
+
+            //@ts-ignore: NOOP
+            socketFactory.createServerSocket = function() {
+                throw new Error("test");
+            };
+
+            let initServerSocketCalled = false;
+            //@ts-ignore
+            socketFactory.initServerSocket = function() {
+                initServerSocketCalled = true;
+            };
+
+            //@ts-ignore
+            socketFactory.triggerEvent = function(name, args) {
+                assert(name == "SERVER_INIT_ERROR" || name == "ERROR");
+                if(args.e && args.e.error) {
+                    assert(args.e.error.message == "test");
+                } else {
+                    assert(args.error.message == "test");
+                }
+            };
+
+            //@ts-ignore
+            socketFactory.openServer();
+        });
+    }
 }
