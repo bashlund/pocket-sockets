@@ -13,6 +13,10 @@ import {
     TCPServer,
 } from "../src/TCPServer";
 
+import {
+    WSServer,
+} from "../src/WSServer";
+
 const assert = require("assert");
 
 @TestSuite()
@@ -1139,5 +1143,79 @@ export class SocketFactoryOpenServer {
             //@ts-ignore
             socketFactory.openServer();
         });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryCreateServerSocket {
+    @Test()
+    public successful_call_websocket() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                }
+            });
+
+            //@ts-ignore
+            const server = socketFactory.createServerSocket();
+
+            //@ts-ignore
+            assert(server);
+            assert(server instanceof WSServer);
+        });
+    }
+
+    @Test()
+    public successful_call_tcp() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "TCP",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                }
+            });
+
+            //@ts-ignore
+            const server = socketFactory.createServerSocket();
+
+            //@ts-ignore
+            assert(server);
+            assert(server instanceof TCPServer);
+        });
+    }
+
+    @Test()
+    public missingSocketType() {
+        assert.throws(() => {
+            let socketFactory = new SocketFactory({
+                //@ts-ignore
+                server: {
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                }
+            });
+
+            //@ts-ignore
+            const server = socketFactory.createServerSocket();
+
+            //@ts-ignore
+            assert(!server);
+        }, /Misconfiguration/);
     }
 }
