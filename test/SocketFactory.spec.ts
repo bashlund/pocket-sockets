@@ -1219,3 +1219,262 @@ export class SocketFactoryCreateServerSocket {
         }, /Misconfiguration/);
     }
 }
+
+@TestSuite()
+export class SocketFactoryInitServerSocket {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                }
+            });
+
+            //@ts-ignore
+            socketFactory.serverSocket = new TCPServer(socketFactory.config.server.serverOptions);
+
+            let onConnectionCalled = false;
+            //@ts-ignore
+            socketFactory.serverSocket.onConnection = function() {
+                onConnectionCalled = true;
+            };
+            let onErrorCalled = false;
+            //@ts-ignore
+            socketFactory.serverSocket.onError = function() {
+                onErrorCalled = true;
+            };
+
+            let listenCalled = false;
+            //@ts-ignore
+            socketFactory.serverSocket.listen = function() {
+                listenCalled = true;
+            };
+
+            //@ts-ignore
+            socketFactory.initServerSocket();
+
+            //@ts-ignore
+            assert(onConnectionCalled == true);
+            //@ts-ignore
+            assert(onErrorCalled == true);
+            //@ts-ignore
+            assert(listenCalled == true);
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryIsDenied {
+    @Test()
+    public successful_call_true() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                }
+            });
+
+            //@ts-ignore
+            socketFactory.serverSocket = new TCPServer(socketFactory.config.server.serverOptions);
+
+            //@ts-ignore
+            const isDenied = socketFactory.isDenied("192.168.5.5");
+
+            //@ts-ignore
+            assert(isDenied == true);
+        });
+    }
+
+    @Test()
+    public successful_call_false() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                }
+            });
+
+            //@ts-ignore
+            socketFactory.serverSocket = new TCPServer(socketFactory.config.server.serverOptions);
+
+            //@ts-ignore
+            const isDenied = socketFactory.isDenied("127.0.0.1");
+
+            //@ts-ignore
+            assert(isDenied == false);
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryIsAllowed {
+    @Test()
+    public successful_call_true() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                }
+            });
+
+            //@ts-ignore
+            socketFactory.serverSocket = new TCPServer(socketFactory.config.server.serverOptions);
+
+            //@ts-ignore
+            const isAllowed = socketFactory.isAllowed("127.0.0.1");
+
+            //@ts-ignore
+            assert(isAllowed == true);
+        });
+    }
+
+    @Test()
+    public successful_call_false() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                }
+            });
+
+            //@ts-ignore
+            socketFactory.serverSocket = new TCPServer(socketFactory.config.server.serverOptions);
+
+            //@ts-ignore
+            const isAllowed = socketFactory.isAllowed("192.168.5.5");
+
+            //@ts-ignore
+            assert(isAllowed == false);
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryIncreaseConnectionsCounter {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                }
+            });
+
+            //@ts-ignore
+            assert(!socketFactory.stats.counters["127.0.0.1"]);
+
+            //@ts-ignore
+            socketFactory.increaseConnectionsCounter("127.0.0.1");
+
+            //@ts-ignore
+            assert(socketFactory.stats.counters["127.0.0.1"].counter == 1);
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryDecreaseConnectionsCounter {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                }
+            });
+
+            //@ts-ignore
+            assert(!socketFactory.stats.counters["127.0.0.1"]);
+            //@ts-ignore
+            socketFactory.stats.counters["127.0.0.1"] = {
+                counter: 1
+            };
+            //@ts-ignore
+            assert(socketFactory.stats.counters["127.0.0.1"].counter == 1);
+
+            //@ts-ignore
+            socketFactory.decreaseConnectionsCounter("127.0.0.1");
+
+            //@ts-ignore
+            assert(socketFactory.stats.counters["127.0.0.1"].counter == 0);
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryDecreaseConnectionsCounter {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                }
+            });
+
+            //@ts-ignore
+            assert(!socketFactory.stats.counters["127.0.0.1"]);
+            //@ts-ignore
+            socketFactory.stats.counters["127.0.0.1"] = {
+                counter: 1
+            };
+            //@ts-ignore
+            assert(socketFactory.stats.counters["127.0.0.1"].counter == 1);
+
+            //@ts-ignore
+            socketFactory.decreaseConnectionsCounter("127.0.0.1");
+
+            //@ts-ignore
+            assert(socketFactory.stats.counters["127.0.0.1"].counter == 0);
+        });
+    }
+}
