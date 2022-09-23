@@ -1445,7 +1445,139 @@ export class SocketFactoryDecreaseConnectionsCounter {
 }
 
 @TestSuite()
-export class SocketFactoryDecreaseConnectionsCounter {
+export class SocketFactoryCheckConnectionsOverflow {
+    @Test()
+    public successful_call_maxConnections() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 0
+            });
+
+            //@ts-ignore
+            const overflow = socketFactory.checkConnectionsOverflow("127.0.0.1");
+
+            //@ts-ignore
+            assert(overflow == true);
+        });
+    }
+
+    @Test()
+    public successful_call_maxConnections_allCount() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 2
+            });
+
+            //@ts-ignore
+            socketFactory.increaseConnectionsCounter("127.0.0.1");
+            //@ts-ignore
+            socketFactory.increaseConnectionsCounter("127.0.0.1");
+
+            //@ts-ignore
+            const overflow = socketFactory.checkConnectionsOverflow("127.0.0.1");
+
+            //@ts-ignore
+            assert(overflow == true);
+        });
+    }
+    @Test()
+    public successful_call_maxConnectionsPerIp() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnectionsPerIp: 0
+            });
+
+            //@ts-ignore
+            const overflow = socketFactory.checkConnectionsOverflow("127.0.0.1");
+
+            //@ts-ignore
+            assert(overflow == true);
+        });
+    }
+
+    @Test()
+    public successful_call_maxConnectionsPerIp_ipCount() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnectionsPerIp: 2
+            });
+
+            //@ts-ignore
+            socketFactory.increaseConnectionsCounter("127.0.0.1");
+            //@ts-ignore
+            socketFactory.increaseConnectionsCounter("127.0.0.1");
+
+            //@ts-ignore
+            const overflow = socketFactory.checkConnectionsOverflow("127.0.0.1");
+
+            //@ts-ignore
+            assert(overflow == true);
+        });
+    }
+
+
+    @Test()
+    public successful_call_no_settings() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+            });
+
+            //@ts-ignore
+            const overflow = socketFactory.checkConnectionsOverflow("127.0.0.1");
+
+            //@ts-ignore
+            assert(overflow == false);
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryIncreaseDecreaseReadCounter {
     @Test()
     public successful_call() {
         assert.doesNotThrow(() => {
@@ -1458,23 +1590,34 @@ export class SocketFactoryDecreaseConnectionsCounter {
                     },
                     deniedIPs: ["192.168.5.5"],
                     allowedIPs: ["127.0.0.1", "localhost"],
-                }
+                },
+                maxConnections: 0
             });
 
             //@ts-ignore
-            assert(!socketFactory.stats.counters["127.0.0.1"]);
-            //@ts-ignore
-            socketFactory.stats.counters["127.0.0.1"] = {
-                counter: 1
-            };
-            //@ts-ignore
-            assert(socketFactory.stats.counters["127.0.0.1"].counter == 1);
+            let counter = socketFactory.readCounter("127.0.0.1");
+            assert(counter == 0);
 
             //@ts-ignore
-            socketFactory.decreaseConnectionsCounter("127.0.0.1");
+            socketFactory.increaseCounter("127.0.0.1");
 
             //@ts-ignore
-            assert(socketFactory.stats.counters["127.0.0.1"].counter == 0);
+            counter = socketFactory.readCounter("127.0.0.1");
+            assert(counter == 1);
+
+            //@ts-ignore
+            socketFactory.increaseCounter("127.0.0.1");
+
+            //@ts-ignore
+            counter = socketFactory.readCounter("127.0.0.1");
+            assert(counter == 2);
+
+            //@ts-ignore
+            socketFactory.decreaseCounter("127.0.0.1");
+
+            //@ts-ignore
+            counter = socketFactory.readCounter("127.0.0.1");
+            assert(counter == 1);
         });
     }
 }
