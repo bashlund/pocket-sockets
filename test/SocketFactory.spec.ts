@@ -60,8 +60,7 @@ export class SocketFactoryConstructor {
             assert(Object.keys(socketFactory.config).length == 1);
             //@ts-ignore
             assert(socketFactory.config.maxConnections == 9);
-            //@ts-ignore
-            assert(Object.keys(socketFactory.stats.counters).length == 1);
+            assert(Object.keys(socketFactory.getStats().counters).length == 1);
             //@ts-ignore
             assert(socketFactory.stats.counters.test.counter == 8);
             //@ts-ignore
@@ -1618,6 +1617,681 @@ export class SocketFactoryIncreaseDecreaseReadCounter {
             //@ts-ignore
             counter = socketFactory.readCounter("127.0.0.1");
             assert(counter == 1);
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryClose {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "TCP",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                },
+
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 0
+            });
+
+            let shutdownCalled = false;
+            //@ts-ignore
+            socketFactory.shutdown = function(){
+                shutdownCalled = true;
+            };
+
+            //@ts-ignore
+            socketFactory.clientSocket = new TCPClient(socketFactory.config.client.clientOptions);
+            let clientSocketCloseCalled = false;
+            //@ts-ignore
+            socketFactory.clientSocket.close = function() {
+                clientSocketCloseCalled = true;
+            };
+
+            assert(socketFactory.isClosed() == false);
+            //@ts-ignore
+            assert(socketFactory.clientSocket);
+            assert(clientSocketCloseCalled == false);
+            //@ts-ignore
+            assert(shutdownCalled == false);
+
+            //@ts-ignore
+            socketFactory.close();
+
+            assert(socketFactory.isClosed() == true);
+            //@ts-ignore
+            assert(socketFactory.serverClientSockets.length == 0);
+            //@ts-ignore
+            assert(!socketFactory.clientSocket);
+            //@ts-ignore
+            assert(clientSocketCloseCalled == true);
+            //@ts-ignore
+            assert(shutdownCalled == true);
+        });
+    }
+
+    @Test()
+    public isClosed() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "TCP",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                },
+
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 0
+            });
+
+            let shutdownCalled = false;
+            //@ts-ignore
+            socketFactory.shutdown = function(){
+                shutdownCalled = true;
+            };
+
+            //@ts-ignore
+            socketFactory.clientSocket = new TCPClient(socketFactory.config.client.clientOptions);
+            let clientSocketCloseCalled = false;
+            //@ts-ignore
+            socketFactory.clientSocket.close = function() {
+                clientSocketCloseCalled = true;
+            };
+
+            //@ts-ignore
+            socketFactory._isClosed = true;
+
+            //@ts-ignore
+            socketFactory.close();
+
+            //@ts-ignore
+            assert(socketFactory._isClosed == true);
+            //@ts-ignore
+            assert(socketFactory.clientSocket);
+            //@ts-ignore
+            assert(clientSocketCloseCalled == false);
+            //@ts-ignore
+            assert(shutdownCalled == false);
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryShutdown {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "TCP",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                },
+
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 0
+            });
+
+            //@ts-ignore
+            socketFactory.serverSocket = new TCPServer(socketFactory.config.server.serverOptions);
+            let serverSocketCloseCalled = false;
+            //@ts-ignore
+            socketFactory.serverSocket.close = function() {
+                serverSocketCloseCalled = true;
+            };
+
+            assert(socketFactory.isClosed() == false);
+            assert(socketFactory.isShutdown() == false);
+
+            //@ts-ignore
+            assert(socketFactory.serverSocket);
+            assert(serverSocketCloseCalled == false);
+
+            //@ts-ignore
+            socketFactory.shutdown();
+
+            assert(socketFactory.isClosed() == false);
+            assert(socketFactory.isShutdown() == true);
+            //@ts-ignore
+            assert(!socketFactory.serverSocket);
+            //@ts-ignore
+            assert(serverSocketCloseCalled == true);
+        });
+    }
+
+    @Test()
+    public isClosed() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "TCP",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                },
+
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 0
+            });
+
+            //@ts-ignore
+            socketFactory.serverSocket = new TCPServer(socketFactory.config.server.serverOptions);
+            let serverSocketCloseCalled = false;
+            //@ts-ignore
+            socketFactory.serverSocket.close = function() {
+                serverSocketCloseCalled = true;
+            };
+
+            //@ts-ignore
+            socketFactory._isClosed = true;
+            //@ts-ignore
+            assert(socketFactory._isShutdown == false);
+
+            //@ts-ignore
+            assert(socketFactory.serverSocket);
+            assert(serverSocketCloseCalled == false);
+
+            //@ts-ignore
+            socketFactory.shutdown();
+
+            //@ts-ignore
+            assert(socketFactory._isClosed == true);
+            //@ts-ignore
+            assert(socketFactory._isShutdown == false);
+            //@ts-ignore
+            assert(socketFactory.serverSocket);
+            //@ts-ignore
+            assert(serverSocketCloseCalled == false);
+        });
+    }
+
+    @Test()
+    public isShutdown() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "TCP",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                },
+
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 0
+            });
+
+            //@ts-ignore
+            socketFactory.serverSocket = new TCPServer(socketFactory.config.server.serverOptions);
+            let serverSocketCloseCalled = false;
+            //@ts-ignore
+            socketFactory.serverSocket.close = function() {
+                serverSocketCloseCalled = true;
+            };
+
+            //@ts-ignore
+            assert(socketFactory._isClosed == false);
+            //@ts-ignore
+            socketFactory._isShutdown = true;
+
+            //@ts-ignore
+            assert(socketFactory.serverSocket);
+            assert(serverSocketCloseCalled == false);
+
+            //@ts-ignore
+            socketFactory.shutdown();
+
+            //@ts-ignore
+            assert(socketFactory._isClosed == false);
+            //@ts-ignore
+            assert(socketFactory._isShutdown == true);
+            //@ts-ignore
+            assert(socketFactory.serverSocket);
+            //@ts-ignore
+            assert(serverSocketCloseCalled == false);
+        });
+    }
+
+    @Test()
+    public missing_serverSocket() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "TCP",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                },
+
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 0
+            });
+
+            //@ts-ignore
+            assert(socketFactory._isClosed == false);
+            //@ts-ignore
+            assert(socketFactory._isShutdown == false);
+
+            //@ts-ignore
+            assert(!socketFactory.serverSocket);
+
+            //@ts-ignore
+            socketFactory.shutdown();
+
+            //@ts-ignore
+            assert(socketFactory._isClosed == false);
+            //@ts-ignore
+            assert(socketFactory._isShutdown == true);
+            //@ts-ignore
+            assert(!socketFactory.serverSocket);
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryOnError {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "TCP",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                },
+
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 0
+            });
+
+            //@ts-ignore
+            socketFactory.hookEvent = function(name, callback) {
+                assert(name == "ERROR");
+            };
+            socketFactory.onError(()=>{});
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryOnServerInitError {
+    @Test()
+    public successful_call()  {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "TCP",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                },
+
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 0
+            });
+
+            //@ts-ignore
+            socketFactory.hookEvent = function(name, callback) {
+                assert(name == "SERVER_INIT_ERROR");
+            };
+            socketFactory.onServerInitError(()=>{});
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryOnServerListenError {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "TCP",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                },
+
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 0
+            });
+
+            //@ts-ignore
+            socketFactory.hookEvent = function(name, callback) {
+                assert(name == "SERVER_LISTEN_ERROR");
+            };
+            socketFactory.onServerListenError(()=>{});
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryOnClientInitError {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "TCP",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                },
+
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 0
+            });
+
+            //@ts-ignore
+            socketFactory.hookEvent = function(name, callback) {
+                assert(name == "CLIENT_INIT_ERROR");
+            };
+            socketFactory.onClientInitError(()=>{});
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryOnConnectError {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "TCP",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                },
+
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 0
+            });
+
+            //@ts-ignore
+            socketFactory.hookEvent = function(name, callback) {
+                assert(name == "CLIENT_CONNECT_ERROR");
+            };
+            socketFactory.onConnectError(()=>{});
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryOnConnect {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "TCP",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                },
+
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 0
+            });
+
+            //@ts-ignore
+            socketFactory.hookEvent = function(name, callback) {
+                assert(name == "CONNECT");
+            };
+            socketFactory.onConnect(()=>{});
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryOnClose {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "TCP",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                },
+
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 0
+            });
+
+            //@ts-ignore
+            socketFactory.hookEvent = function(name, callback) {
+                assert(name == "CLOSE");
+            };
+            socketFactory.onClose(()=>{});
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryOnRefusedClientConnection {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "TCP",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                },
+
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 0
+            });
+
+            //@ts-ignore
+            socketFactory.hookEvent = function(name, callback) {
+                assert(name == "CLIENT_REFUSE");
+            };
+            socketFactory.onRefusedClientConnection(()=>{});
+        });
+    }
+}
+
+@TestSuite()
+export class SocketFactoryHookUnhookTriggerEvent {
+    @Test()
+    public successful_call() {
+        assert.doesNotThrow(() => {
+            let socketFactory = new SocketFactory({
+                client: {
+                    socketType: "TCP",
+                    clientOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    reconnectDelay: 0,
+                },
+
+                server: {
+                    socketType: "WebSocket",
+                    serverOptions: {
+                        "host": "host.com",
+                        "port": 99
+                    },
+                    deniedIPs: ["192.168.5.5"],
+                    allowedIPs: ["127.0.0.1", "localhost"],
+                },
+                maxConnections: 0
+            });
+
+            let callbackCalled = false;
+            const testCallback = function(testArg: string) {
+                assert(testArg == "test argument");
+                callbackCalled = true;
+            };
+            //@ts-ignore
+            assert(!socketFactory.handlers["testtype"]);
+            //@ts-ignore
+            socketFactory.hookEvent("testtype", testCallback);
+            //@ts-ignore
+            assert(socketFactory.handlers["testtype"].length == 1);
+
+            //@ts-ignore
+            assert(callbackCalled == false);
+            //@ts-ignore
+            socketFactory.triggerEvent("testtype", "test argument");
+            //@ts-ignore
+            assert(callbackCalled == true);
+
+            //@ts-ignore
+            socketFactory.unhookEvent("testtype", testCallback);
+            //@ts-ignore
+            assert(socketFactory.handlers["testtype"].length == 0);
+
         });
     }
 }
