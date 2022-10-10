@@ -24,7 +24,7 @@ export class ByteSize
 
     public async read(nrBytes: number, timeout: number = 3000): Promise<Buffer> {
         if (this.ended || this.timeoutId) {
-            throw "Cannot reuse a ByteSize";
+            throw new Error("Cannot reuse a ByteSize");
         }
         this.nrBytes = nrBytes;
         if (timeout) {

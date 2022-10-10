@@ -100,11 +100,11 @@ export class WSClient extends Client
      */
     protected socketConnect() {
         if (this.socket) {
-            throw "Socket already created.";
+            throw new Error("Socket already created.");
         }
 
         if (!this.clientOptions) {
-            throw "clientOptions is required to create socket.";
+            throw new Error("clientOptions is required to create socket.");
         }
 
         let host = this.clientOptions.host ? this.clientOptions.host : "localhost";
@@ -154,7 +154,7 @@ export class WSClient extends Client
             this.socket.onopen = this.socketConnected;
         }
         else {
-            throw "Could not create socket.";
+            throw new Error("Could not create socket.");
         }
     }
 

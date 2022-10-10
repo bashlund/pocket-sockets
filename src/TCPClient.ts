@@ -61,11 +61,11 @@ export class TCPClient extends Client
      */
     protected socketConnect() {
         if (this.socket) {
-            throw "Socket already created.";
+            throw new Error("Socket already created.");
         }
 
         if (!this.clientOptions) {
-            throw "clientOptions is required to create socket.";
+            throw new Error("clientOptions is required to create socket.");
         }
 
         const USE_TLS = this.clientOptions.secure ? true: false;
@@ -94,7 +94,7 @@ export class TCPClient extends Client
         }
 
         if (!this.socket) {
-            throw "Could not create socket.";
+            throw new Error("Could not create socket.");
         }
     }
 

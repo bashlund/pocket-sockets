@@ -80,14 +80,14 @@ export abstract class Server
      * Create the server socket.
      */
     protected serverCreate() {
-        throw "Not implemented.";
+        throw new Error("Not implemented.");
     }
 
     /**
      * Initiate the server listener.
      */
     protected serverListen() {
-        throw "Not implemented.";
+        throw new Error("Not implemented.");
     }
 
     /**
@@ -95,7 +95,7 @@ export abstract class Server
      * Override as necessary.
      */
     protected serverClose() {
-        throw "Not implemented.";
+        throw new Error("Not implemented.");
     }
 
     /**

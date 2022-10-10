@@ -47,7 +47,7 @@ export class VirtualClient extends Client
      */
     public pair(pairedSocket: VirtualClient) {
         if (this.pairedSocket) {
-            throw "Socket can only be paired once.";
+            throw new Error("Socket can only be paired once.");
         }
         this.pairedSocket = pairedSocket;
         this.pairedSocket.pairedSocket = this;
@@ -62,7 +62,7 @@ export class VirtualClient extends Client
      */
     public setLatency(latency: number) {
         if (latency < this.latency && this.outQueue.length > 0) {
-            throw "Cannot decrease latency while data is still waiting to send.";
+            throw new Error("Cannot decrease latency while data is still waiting to send.");
         }
         this.latency = latency;
     }

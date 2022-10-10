@@ -46,7 +46,7 @@ export abstract class Client
         }
 
         if ( !(data instanceof Buffer)) {
-            throw "Data must be of Buffer type.";
+            throw new Error("Data must be of Buffer type.");
         }
 
         this.socketSend(data);
@@ -177,14 +177,14 @@ export abstract class Client
      * A server listener socket client is already connected and must be passed in the constructor.
      */
     protected socketConnect() {
-        throw "Function not implemented.";
+        throw new Error("Function not implemented.");
     }
 
     /**
      * Hook events on the socket.
      */
     protected socketHook() {
-        throw "Function not implemented.";
+        throw new Error("Function not implemented.");
     }
 
     /**
@@ -192,14 +192,14 @@ export abstract class Client
      * Socket specific implementation.
      */
     protected socketSend(buffer: Buffer) {
-        throw "Function not implemented.";
+        throw new Error("Function not implemented.");
     }
 
     /**
      * Socket-specific close procedure.
      */
     protected socketClose() {
-        throw "Function not implemented.";
+        throw new Error("Function not implemented.");
     }
 
     /**
@@ -218,7 +218,7 @@ export abstract class Client
      */
     protected socketData = (data: Buffer) => {
         if ( !(data instanceof Buffer)) {
-            throw "Must read buffer.";
+            throw new Error("Must read buffer.");
         }
 
         const bufferData = this.clientOptions?.bufferData === undefined ? true : this.clientOptions.bufferData;
