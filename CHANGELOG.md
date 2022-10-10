@@ -1,5 +1,18 @@
 # CHANGELOG: pocket-sockets
 
+## [1.2.0] - 20221010
+Refactor throw "..." to throw new Error("...")
+Add SocketFactory + tests  
+Add VirtualServer class to complement VirtualClient  
+Implement getRemoteAddress, getRemotePort, getLocalPort, getLocalAddress for WSClient and VirtualClient  
+Add optional closeClients parameter to Server.close()  
+Improve self-signed cert generation script and add rejectUnauthorized tests  
+Add TLS connection test suites  
+Add TCP connection test suite covering IPv4 and IPv6 host validation  
+Add TCP connection test suite covering IPv4 and IPv6 host validation  
+Ensure WSClient IPv6 host gets surrounded with brackets during socketConnect  
+Verify and set default error message when ws.ErrorEvent is undefined  
+
 ## [1.1.1] - 20220516
 Audit npm packages version
 
