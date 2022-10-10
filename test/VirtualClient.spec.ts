@@ -12,6 +12,7 @@ export class VirtualClientConstructor {
         let client;
         assert.doesNotThrow(() => {
             client = new VirtualClient();
+            //@ts-ignore
             assert(!client.pairedSocket);
         });
     }*/
@@ -22,9 +23,13 @@ export class VirtualClientConstructor {
         assert.doesNotThrow(() => {
             let client1, client2;
             [client1, client2 ] = CreatePair();
+            //@ts-ignore
             assert(client1.pairedSocket);
+            //@ts-ignore
             assert(client2.pairedSocket);
+            //@ts-ignore
             assert(client2.pairedSocket!.pairedSocket);
+            //@ts-ignore
             assert(client2.pairedSocket!.outQueue.length == 0);
         });
     }
@@ -38,8 +43,10 @@ export class VirtualClientSetLatency {
         assert.doesNotThrow(() => {
             let client1, client2;
             [client1, client2 ] = CreatePair();
+            //@ts-ignore
             assert(client1.latency == 0);
             client1.setLatency(20);
+            //@ts-ignore
             assert(client1.latency == 20);
         });
     }
@@ -81,6 +88,7 @@ export class VirtualClientSocketSend {
         assert.doesNotThrow(() => {
             let client1, client2;
             [client1, client2 ] = CreatePair();
+            //@ts-ignore
             assert(client1.outQueue.length == 0);
 
             let called = false;
