@@ -217,11 +217,11 @@ export class SocketFactory {
             return;
         }
 
-        socket.onError( (buf: Buffer) => {
+        socket.onError( (errorMessage: string) => {
             if (socket === this.clientSocket) {
                 delete this.clientSocket;
             }
-            const error = new Error(buf.toString());
+            const error = new Error(errorMessage);
             this.triggerEvent(EVENTS.CLIENT_CONNECT_ERROR.name, {error});
             this.triggerEvent(EVENTS.ERROR.name, {subEvent: EVENTS.CLIENT_CONNECT_ERROR.name, e: {error}});
             if (this.config.client?.reconnectDelay ?? 0 > 0) {
@@ -335,8 +335,8 @@ export class SocketFactory {
             });
             this.triggerEvent(EVENTS.CONNECT.name, {client: socket, isServer: true});
         });
-        this.serverSocket.onError( (buf: Buffer) => {
-            const error = new Error(buf.toString());
+        this.serverSocket.onError( (errorMessage: string) => {
+            const error = new Error(errorMessage);
             this.triggerEvent(EVENTS.SERVER_LISTEN_ERROR.name, {error});
             this.triggerEvent(EVENTS.ERROR.name, {subEvent: EVENTS.SERVER_LISTEN_ERROR.name, e: {error}});
         });

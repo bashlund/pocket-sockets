@@ -36,7 +36,7 @@ export class VirtualServer extends Server
      * Trigger an error event.
      */
     public simulateError(error: Error) {
-        this.serverError(Buffer.from(error.message));
+        this.serverError(error.message);
     }
 
     /**

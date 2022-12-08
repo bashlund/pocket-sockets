@@ -1,3 +1,22 @@
+import {
+    Client,
+} from "./Client";
+
+/** Event emitted on client socket connect error. */
+export type SocketErrorCallback = (message: string) => void;
+
+/** Event emitted on incoming data on socket. */
+export type SocketDataCallback = (data: Buffer) => void;
+
+/** Event emitted on socket connected. */
+export type SocketConnectCallback = () => void;
+
+/** Event emitted on socket close. */
+export type SocketCloseCallback = (hadError: boolean) => void;
+
+/** Event emitted on server socket accepted. */
+export type SocketAcceptedCallback = (client: Client) => void;
+
 export type ClientOptions = {
     /**
      * RFC6066 states that this should not be an IP address but a name when using TLS.

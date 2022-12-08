@@ -200,7 +200,7 @@ export class WSClient extends Client
         }
     }
 
-    private error = (error: ws.ErrorEvent) => {
-        this.socketError(Buffer.from(error.message ? error.message : "Unknown error message"));
+    protected error = (error: ws.ErrorEvent) => {
+        this.socketError(error.message || "Unknown error message");
     };
 }

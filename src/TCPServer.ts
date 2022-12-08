@@ -70,7 +70,7 @@ export class TCPServer extends Server
         this.addClient(client);
     }
 
-    private error = (error: Error) => {
-        this.serverError(Buffer.from(error.message));
+    protected error = (error: Error) => {
+        this.serverError(error.message);
     };
 }

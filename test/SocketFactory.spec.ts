@@ -824,7 +824,7 @@ export class SocketFactoryInitClientSocket {
                     socketFactory.clientSocket.onClose = function(fn) {
                         onCloseCalled = true;
                     };
-                    fn("test");
+                    fn();
                 },
                 connect: function() {
                     connectCalled = true;
@@ -901,7 +901,7 @@ export class SocketFactoryInitClientSocket {
                     socketFactory.clientSocket.close = function(fn) {
                         closeCalled = true;
                     };
-                    fn("test");
+                    fn();
                     //@ts-ignore
                     assert(closeCalled == true);
                 },

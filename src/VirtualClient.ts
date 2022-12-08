@@ -138,7 +138,7 @@ export class VirtualClient extends Client
      * Internal function to copy one message in the out queue to the paired socket.
      *
      */
-    private copyToPaired() {
+    protected copyToPaired() {
         if (this.pairedSocket) {
             const buffer = this.outQueue.shift();
             if (buffer) {

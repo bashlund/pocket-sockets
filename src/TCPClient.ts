@@ -130,7 +130,7 @@ export class TCPClient extends Client
         }
     }
 
-    private error = (error: Error) => {
-        this.socketError(Buffer.from(error.message));
+    protected error = (error: Error) => {
+        this.socketError(error.message);
     };
 }

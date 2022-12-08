@@ -1,5 +1,10 @@
 import {Client} from "./Client";
-import {ServerOptions} from "./types";
+import {
+    ServerOptions,
+    SocketErrorCallback,
+    SocketCloseCallback,
+    SocketAcceptedCallback,
+} from "./types";
 
 /**
  * Boilerplate for creating and wrapping a server socket listener (TCP or Websocket) under a common interface.
@@ -52,18 +57,18 @@ export abstract class Server
      *
      * @param {Function} fn callback
      */
-    public onConnection(fn: Function) {
+    public onConnection(fn: SocketAcceptedCallback) {
         this.on("connection", fn);
     }
 
     /**
      * Event handler triggered when a server error occurs.
      *
-     * An error object is passed as argument to fn().
+     * An error string is passed as argument to fn().
      *
      * @param {Function} fn callback
      */
-    public onError(fn: Function) {
+    public onError(fn: SocketErrorCallback) {
         this.on("error", fn);
     }
 
@@ -72,7 +77,7 @@ export abstract class Server
      *
      * @param {Function} fn callback
      */
-    public onClose(fn: Function) {
+    public onClose(fn: SocketCloseCallback) {
         this.on("close", fn);
     }
 
@@ -103,8 +108,8 @@ export abstract class Server
      *
      * @param {Error} err
      */
-    protected serverError = (err: any) => {
-        this.triggerEvent("error", (err && err.message) ? err.message : err);
+    protected serverError = (message: string) => {
+        this.triggerEvent("error", message);
     }
 
     /**
@@ -131,7 +136,7 @@ export abstract class Server
      *
      * @param {Client} client
      */
-    private removeClient(client: Client) {
+    protected removeClient(client: Client) {
         const index = this.clients.indexOf(client);
         if (index > -1) {
             this.clients.splice(index, 1)
@@ -144,7 +149,7 @@ export abstract class Server
      * @param {string} event
      * @param {Function} fn
      */
-    private on(event: string, fn: Function) {
+    public on(event: string, fn: Function) {
         const fns = this.eventHandlers[event] || [];
         this.eventHandlers[event] = fns;
         fns.push(fn);
@@ -156,7 +161,7 @@ export abstract class Server
      * @param {string} event
      * @param {any} data
      */
-    private triggerEvent(event: string, data?: any) {
+    protected triggerEvent(event: string, data?: any) {
         const fns = this.eventHandlers[event] || [];
         fns.forEach( fn => {
             fn(data);

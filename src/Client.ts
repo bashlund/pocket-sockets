@@ -1,4 +1,10 @@
-import {ClientOptions} from "./types";
+import {
+    ClientOptions,
+    SocketErrorCallback,
+    SocketDataCallback,
+    SocketConnectCallback,
+    SocketCloseCallback,
+} from "./types";
 
 /**
  * Class for wrapping a socket (TCP, Websocket or Virtual) under a common interface.
@@ -64,12 +70,12 @@ export abstract class Client
     }
 
     /**
-     * User hook for socket errors.
+     * User hook for socket connection error.
      *
-     * @param {Function} fn - on error callback. Function is passed a Buffer object with the error message
+     * @param {Function} fn - on error callback. Function is passed a string with the error message.
      *
      */
-    public onError(fn: Function) {
+    public onError(fn: SocketErrorCallback) {
         this.on("error", fn);
     }
 
@@ -79,7 +85,7 @@ export abstract class Client
      * @param {Function} fn - remove existing error callback
      *
      */
-    public offError(fn: Function) {
+    public offError(fn: SocketErrorCallback) {
         this.off("error", fn);
     }
 
@@ -88,7 +94,7 @@ export abstract class Client
      *
      * @param {Function} fn - on data callback. Function is passed a Buffer object.
      */
-    public onData(fn: Function) {
+    public onData(fn: SocketDataCallback) {
         this.on("data", fn);
     }
 
@@ -98,7 +104,7 @@ export abstract class Client
      * @param {Function} fn - remove data callback.
      *
      */
-    public offData(fn: Function) {
+    public offData(fn: SocketDataCallback) {
         this.off("data", fn);
     }
 
@@ -108,7 +114,7 @@ export abstract class Client
      * @param {Function} fn - on connect callback.
      *
      */
-    public onConnect(fn: Function) {
+    public onConnect(fn: SocketConnectCallback) {
         this.on("connect", fn);
     }
 
@@ -118,7 +124,7 @@ export abstract class Client
      * @param {Function} fn - remove connect callback.
      *
      */
-    public offConnect(fn: Function) {
+    public offConnect(fn: SocketConnectCallback) {
         this.off("connect", fn);
     }
 
@@ -128,7 +134,7 @@ export abstract class Client
      * @param {Function} fn - on close callback.
      *
      */
-    public onClose(fn: Function) {
+    public onClose(fn: SocketCloseCallback) {
         this.on("close", fn);
     }
 
@@ -138,7 +144,7 @@ export abstract class Client
      * @param {Function} fn - remove close callback.
      *
      */
-    public offClose(fn: Function) {
+    public offClose(fn: SocketCloseCallback) {
         this.off("close", fn);
     }
 
@@ -238,7 +244,7 @@ export abstract class Client
      * @param {Buffer} data - error message.
      *
      */
-    protected socketError = (message: Buffer) => {
+    protected socketError = (message: string) => {
         this.triggerEvent("error", message);
     }
 
@@ -249,7 +255,7 @@ export abstract class Client
      * @param {Function} fn - callback.
      *
      */
-    private off(event: string, fn: Function) {
+    protected off(event: string, fn: Function) {
         const [fns, queue] = (this.eventHandlers[event] || [[], []]);
         const index = fns.indexOf(fn);
         if (index > -1) {
@@ -264,7 +270,7 @@ export abstract class Client
      * @param {Function} fn - callback.
      *
      */
-    private on(event: string, fn: Function) {
+    protected on(event: string, fn: Function) {
         const tuple = (this.eventHandlers[event] || [[], []]);
         this.eventHandlers[event] = tuple;
         const [fns, queue] = tuple;
@@ -287,7 +293,7 @@ export abstract class Client
      * @param {boolean} [invertOrder] - used for "unreading" an event and puts it first in the queue (if doBuffer is true)
      *
      */
-    private triggerEvent(event: string, data?: any, doBuffer = false, invertOrder = false) {
+    protected triggerEvent(event: string, data?: any, doBuffer = false, invertOrder = false) {
         const tuple = (this.eventHandlers[event] || [[], []]);
         this.eventHandlers[event] = tuple;
         const [fns, queue] = tuple;
