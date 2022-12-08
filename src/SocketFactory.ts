@@ -324,7 +324,7 @@ export class SocketFactory {
                                       {reason: EVENTS.CLIENT_REFUSE.reason.IP_NOT_ALLOWED, key: clientIP});
                     return;
                 }
-                if (this.checkConnectionsOverflow(clientIP)) {
+                if (this.checkConnectionsOverflow(clientIP, true)) {
                     socket.close();
                     this.triggerEvent(EVENTS.CLIENT_REFUSE.name,
                                       {reason: EVENTS.CLIENT_REFUSE.reason.IP_OVERFLOW, key: clientIP});
@@ -383,9 +383,10 @@ export class SocketFactory {
 
     /**
      * @params key IP address or host name.
+     * @params isServer set to true if it is server socket checking.
      * @returns true if any limit is reached.
      */
-    protected checkConnectionsOverflow(address: string): boolean {
+    protected checkConnectionsOverflow(address: string, isServer: boolean = false): boolean {
         if (this.config.maxConnections !== undefined) {
             const allCount = this.readCounter("*");
             if (allCount >= this.config.maxConnections) {
