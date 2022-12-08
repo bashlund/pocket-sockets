@@ -180,6 +180,10 @@ export class SocketFactory {
         }
 
         if (this.checkConnectionsOverflow(this.config.client.clientOptions.host ?? "localhost")) {
+            if (this.config.client?.reconnectDelay ?? 0 > 0) {
+                const delay = this.config.client!.reconnectDelay! * 1000;
+                setTimeout( () => this.connectClient(), delay);
+            }
             return;
         }
 
@@ -238,6 +242,10 @@ export class SocketFactory {
             if (this.checkConnectionsOverflow(this.config.client.clientOptions.host ?? "localhost")) {
                 delete this.clientSocket;
                 socket.close();
+                if (this.config.client?.reconnectDelay ?? 0 > 0) {
+                    const delay = this.config.client!.reconnectDelay! * 1000;
+                    setTimeout( () => this.connectClient(), delay);
+                }
                 return;
             }
             socket.onClose( (hadError: boolean) => {
