@@ -1,5 +1,12 @@
 # CHANGELOG: pocket-sockets
 
+## [2.0.0] - 20221209
+Change onError callback signature (breaking).  
+Change class access modifiers from private to protected.  
+Add optional reconnect attempt in case of connection overflow.  
+Add isServer argument to checkConnectionsOverflow.  
+npm audit fix minimatch.  
+
 ## [1.2.0] - 20221010
 Refactor throw "..." to throw new Error("...")
 Add SocketFactory + tests  
