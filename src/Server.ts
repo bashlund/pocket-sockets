@@ -14,10 +14,10 @@ import {
  */
 export abstract class Server
 {
-    serverOptions: ServerOptions;
-    eventHandlers: {[key: string]: Function[]};
-    isClosed: boolean;
-    clients: Client[];
+    protected serverOptions: ServerOptions;
+    protected eventHandlers: {[key: string]: Function[]};
+    protected isClosed: boolean;
+    protected clients: ClientInterface[];
 
     constructor(serverOptions: ServerOptions) {
         this.serverOptions  = serverOptions;

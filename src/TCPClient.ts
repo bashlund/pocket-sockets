@@ -9,7 +9,7 @@ import {ClientOptions} from "./types";
  */
 export class TCPClient extends Client
 {
-    socket?: net.Socket;
+    protected socket?: net.Socket;
 
     constructor(clientOptions: ClientOptions, socket?: net.Socket) {
         super(clientOptions);

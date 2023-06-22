@@ -6,13 +6,13 @@ import {Client} from "./Client";
 
 export class ByteSize
 {
-    client: Client;
-    data: Buffer;
-    resolve?: Function;
-    reject?: Function;
-    ended: boolean;
-    nrBytes?: number;
-    timeoutId?: ReturnType<typeof setTimeout>;
+    protected client: ClientInterface;
+    protected data: Buffer;
+    protected resolve?: Function;
+    protected reject?: Function;
+    protected ended: boolean;
+    protected nrBytes?: number;
+    protected timeoutId?: ReturnType<typeof setTimeout>;
 
     constructor(client: Client) {
         this.client = client;

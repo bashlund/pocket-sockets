@@ -9,8 +9,5 @@
     },
     "files": [
         "./index.ts"
-    ],
-    "include": [
-        "src/**/*"
     ]
 }

@@ -13,9 +13,9 @@ import {
  */
 export abstract class Client
 {
-    clientOptions?: ClientOptions;
-    eventHandlers: {[key: string]: [Function[], (Buffer | undefined)[]]};
-    isClosed: boolean;
+    protected clientOptions?: ClientOptions;
+    protected eventHandlers: {[key: string]: [Function[], (Buffer | undefined)[]]};
+    protected isClosed: boolean;
 
     constructor(clientOptions: ClientOptions) {
         this.clientOptions  = clientOptions;

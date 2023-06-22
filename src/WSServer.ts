@@ -10,8 +10,8 @@ import * as https from "https";
  */
 export class WSServer extends Server
 {
-    server?: http.Server | https.Server;
-    wsServer?: WebSocket.Server;
+    protected server?: http.Server | https.Server;
+    protected wsServer?: WebSocket.Server;
 
     constructor(serverOptions: ServerOptions) {
         super(serverOptions);

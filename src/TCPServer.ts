@@ -10,7 +10,7 @@ import {ServerOptions} from "./types";
  */
 export class TCPServer extends Server
 {
-    server?: net.Server;
+    protected server?: net.Server;
 
     constructor(serverOptions: ServerOptions) {
         super(serverOptions);

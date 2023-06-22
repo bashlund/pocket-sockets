@@ -36,7 +36,7 @@ if (typeof WebSocket !== "undefined") {
  */
 export class WSClient extends Client
 {
-    socket?: ws;
+    protected socket?: ws;
 
     constructor(clientOptions: ClientOptions, socket?: ws) {
         super(clientOptions);
