@@ -2,7 +2,7 @@
  * This can be used to await X nr of bytes on the client socket.
  *
  */
-import {Client} from "./Client";
+import {ClientInterface} from "./types";
 
 export class ByteSize
 {
@@ -14,7 +14,7 @@ export class ByteSize
     protected nrBytes?: number;
     protected timeoutId?: ReturnType<typeof setTimeout>;
 
-    constructor(client: Client) {
+    constructor(client: ClientInterface) {
         this.client = client;
         this.data = Buffer.alloc(0);
         this.client.onData(this.onData);

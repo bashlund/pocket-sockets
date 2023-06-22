@@ -19,93 +19,24 @@ import {
 } from "./Server";
 
 import {
-    Client,
-} from "./Client";
-
-import {
     WSClient,
 } from "./WSClient";
 
 import {
     SocketFactoryConfig,
     SocketFactoryStats,
+    ClientInterface,
+    SocketFactoryInterface,
+    EVENTS,
+    ErrorCallback,
+    ClientInitErrorCallback,
+    ClientConnectErrorCallback,
+    ConnectCallback,
+    CloseCallback,
+    ServerInitErrorCallback,
+    ServerListenErrorCallback,
+    ClientRefuseCallback,
 } from "./types";
-
-/**
- * A map over all events emitted from this SocketFactory.
- * The ERROR events is special that it is emitted together with a specific error event.
- */
-export const EVENTS = {
-    ERROR: {
-        name: "ERROR",
-        /* These are the names of the events which also are emitted as ERROR events. */
-        subEvents: [
-            "CLIENT_INIT_ERROR",
-            "CLIENT_CONNECT_ERROR",
-            "SERVER_INIT_ERROR",
-            "SERVER_LISTEN_ERROR",
-        ],
-    },
-    CLIENT_INIT_ERROR: {
-        name: "CLIENT_INIT_ERROR",
-    },
-    CLIENT_CONNECT_ERROR: {
-        name: "CLIENT_CONNECT_ERROR",
-    },
-    CLOSE: {
-        name: "CLOSE",
-    },
-    CONNECT: {
-        name: "CONNECT",
-    },
-    SERVER_INIT_ERROR: {
-        name: "SERVER_INIT_ERROR",
-    },
-    SERVER_LISTEN_ERROR: {
-        name: "SERVER_LISTEN_ERROR",
-    },
-    CLIENT_REFUSE: {
-        name: "CLIENT_REFUSE",
-        reason: {
-            IP_DENIED: "IP_DENIED",
-            IP_NOT_ALLOWED: "IP_NOT_ALLOWED",
-            IP_OVERFLOW: "IP_OVERFLOW",
-        },
-    },
-};
-
-/**
- * This error event is always emitted in addition to every specific error event.
- * It is a good catch-all error event handler.
- * @param e.subEvent is the name of the specific error event which was emitted.
- * These options are in EVENTS.ERROR.subEvents list.
- * @param e.e is the original event parameter(s) passed on in an object.
- */
-export type ErrorCallback = (e: {subEvent: string, e: object}) => void;
-
-/** Event emitted when client socket cannot be initaited, likely due to misconfiguration. */
-export type ClientInitErrorCallback = (e: {error: Error}) => void;
-
-/** Event emitted when client socket cannot connect to server. */
-export type ClientConnectErrorCallback = (error: Error) => void;
-
-/** Event emitted when client socket connected. */
-export type ConnectCallback = (e: {client: Client, isServer: boolean}) => void;
-
-/** Event emitted when either client or server accepted socket is closed. */
-export type CloseCallback = (e: {client: Client, isServer: boolean, hadError: boolean}) => void;
-
-/** Event emitted when server socket cannot be created. */
-export type ServerInitErrorCallback = (error: Error) => void;
-
-/** Event emitted when server socket cannot bind and listen, could be that port is taken. */
-export type ServerListenErrorCallback = (error: Error) => void;
-
-/**
- * Event emitted when server actively refused the client's IP address.
- * @reason is found in EVENTS.CLIENT_REFUSE.reason
- */
-export type ClientRefuseCallback = (e: {reason: string, key: string}) => void;
 
 /**
  * A SocketFactory emits connected sockets.
@@ -125,13 +56,13 @@ export type ClientRefuseCallback = (e: {reason: string, key: string}) => void;
  * using a client socket small) the relevant difference is a unified interface for client and server and also
  * importantly that a client SocketFactory can share stats within and with other factories to avoid redundant connections.
  */
-export class SocketFactory {
+export class SocketFactory implements SocketFactoryInterface {
     protected config: SocketFactoryConfig;
     protected stats: SocketFactoryStats;
     protected handlers: {[type: string]: Function[]};
-    protected serverClientSockets: Client[];
+    protected serverClientSockets: ClientInterface[];
     protected serverSocket?: Server;
-    protected clientSocket?: Client;
+    protected clientSocket?: ClientInterface;
     protected _isClosed: boolean;
     protected _isShutdown: boolean;
 
@@ -202,7 +133,7 @@ export class SocketFactory {
     /**
      * @throws
      */
-    protected createClientSocket(): Client {
+    protected createClientSocket(): ClientInterface {
         if (this.config.client?.socketType === "WebSocket") {
             return new WSClient(this.config.client.clientOptions);
         }
@@ -309,7 +240,7 @@ export class SocketFactory {
             return;
         }
 
-        this.serverSocket.onConnection( async (socket: Client) => {
+        this.serverSocket.onConnection( async (socket: ClientInterface) => {
             let clientIP = socket.getRemoteAddress();
             if (clientIP) {
                 if (this.isDenied(clientIP)) {
@@ -336,7 +267,7 @@ export class SocketFactory {
                 if (clientIP) {
                     this.decreaseConnectionsCounter(clientIP);
                 }
-                this.serverClientSockets = this.serverClientSockets.filter( (socket2: Client) => {
+                this.serverClientSockets = this.serverClientSockets.filter( (socket2: ClientInterface) => {
                     return socket !== socket2;
                 });
                 this.triggerEvent(EVENTS.CLOSE.name, {client: socket, isServer: true, hadError});
@@ -429,7 +360,7 @@ export class SocketFactory {
         }
         this.shutdown();
         this._isClosed = true;
-        this.serverClientSockets.forEach( (client: Client) => {
+        this.serverClientSockets.forEach( (client: ClientInterface) => {
             client.close();
         });
         this.serverClientSockets = [];

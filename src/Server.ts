@@ -1,4 +1,4 @@
-import {Client} from "./Client";
+import {ClientInterface} from "./types";
 import {
     ServerOptions,
     SocketErrorCallback,
@@ -123,9 +123,9 @@ export abstract class Server
     /**
      * Performs all operations involved in registering a new client connection.
      *
-     * @param {Client} client
+     * @param {ClientInterface} client
      */
-    protected addClient(client: Client) {
+    protected addClient(client: ClientInterface) {
         this.clients.push(client);
         client.onClose( () => { this.removeClient(client) } );
         this.triggerEvent("connection", client);
@@ -134,9 +134,9 @@ export abstract class Server
     /**
      * Performs all operations involved in removing an existing client registration.
      *
-     * @param {Client} client
+     * @param {ClientInterface} client
      */
-    protected removeClient(client: Client) {
+    protected removeClient(client: ClientInterface) {
         const index = this.clients.indexOf(client);
         if (index > -1) {
             this.clients.splice(index, 1)

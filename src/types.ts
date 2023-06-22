@@ -1,7 +1,3 @@
-import {
-    Client,
-} from "./Client";
-
 /** Event emitted on client socket connect error. */
 export type SocketErrorCallback = (message: string) => void;
 
@@ -15,7 +11,121 @@ export type SocketConnectCallback = () => void;
 export type SocketCloseCallback = (hadError: boolean) => void;
 
 /** Event emitted on server socket accepted. */
-export type SocketAcceptedCallback = (client: Client) => void;
+export type SocketAcceptedCallback = (client: ClientInterface) => void;
+
+/**
+ * A map over all events emitted from this SocketFactory.
+ * The ERROR events is special that it is emitted together with a specific error event.
+ */
+export const EVENTS = {
+    ERROR: {
+        name: "ERROR",
+        /* These are the names of the events which also are emitted as ERROR events. */
+        subEvents: [
+            "CLIENT_INIT_ERROR",
+            "CLIENT_CONNECT_ERROR",
+            "SERVER_INIT_ERROR",
+            "SERVER_LISTEN_ERROR",
+        ],
+    },
+    CLIENT_INIT_ERROR: {
+        name: "CLIENT_INIT_ERROR",
+    },
+    CLIENT_CONNECT_ERROR: {
+        name: "CLIENT_CONNECT_ERROR",
+    },
+    CLOSE: {
+        name: "CLOSE",
+    },
+    CONNECT: {
+        name: "CONNECT",
+    },
+    SERVER_INIT_ERROR: {
+        name: "SERVER_INIT_ERROR",
+    },
+    SERVER_LISTEN_ERROR: {
+        name: "SERVER_LISTEN_ERROR",
+    },
+    CLIENT_REFUSE: {
+        name: "CLIENT_REFUSE",
+        reason: {
+            IP_DENIED: "IP_DENIED",
+            IP_NOT_ALLOWED: "IP_NOT_ALLOWED",
+            IP_OVERFLOW: "IP_OVERFLOW",
+        },
+    },
+};
+
+/**
+ * This error event is always emitted in addition to every specific error event.
+ * It is a good catch-all error event handler.
+ * @param e.subEvent is the name of the specific error event which was emitted.
+ * These options are in EVENTS.ERROR.subEvents list.
+ * @param e.e is the original event parameter(s) passed on in an object.
+ */
+export type ErrorCallback = (e: {subEvent: string, e: object}) => void;
+
+/** Event emitted when client socket cannot be initaited, likely due to misconfiguration. */
+export type ClientInitErrorCallback = (e: {error: Error}) => void;
+
+/** Event emitted when client socket cannot connect to server. */
+export type ClientConnectErrorCallback = (error: Error) => void;
+
+/** Event emitted when client socket connected. */
+export type ConnectCallback = (e: {client: ClientInterface, isServer: boolean}) => void;
+
+/** Event emitted when either client or server accepted socket is closed. */
+export type CloseCallback = (e: {client: ClientInterface, isServer: boolean, hadError: boolean}) => void;
+
+/** Event emitted when server socket cannot be created. */
+export type ServerInitErrorCallback = (error: Error) => void;
+
+/** Event emitted when server socket cannot bind and listen, could be that port is taken. */
+export type ServerListenErrorCallback = (error: Error) => void;
+
+/**
+ * Event emitted when server actively refused the client's IP address.
+ * @reason is found in EVENTS.CLIENT_REFUSE.reason
+ */
+export type ClientRefuseCallback = (e: {reason: string, key: string}) => void;
+
+export interface ClientInterface {
+    connect(): void;
+    sendString(data: string): void;
+    send(data: Buffer): void;
+    close(): void;
+    onError(fn: SocketErrorCallback): void;
+    offError(fn: SocketErrorCallback): void;
+    onData(fn: SocketDataCallback): void;
+    offData(fn: SocketDataCallback): void;
+    onConnect(fn: SocketConnectCallback): void;
+    offConnect(fn: SocketConnectCallback): void;
+    onClose(fn: SocketCloseCallback): void;
+    offClose(fn: SocketCloseCallback): void;
+    getLocalAddress(): string | undefined;
+    getRemoteAddress(): string | undefined;
+    getRemotePort(): number | undefined;
+    getLocalPort(): number | undefined;
+    unRead(data: Buffer): void;
+}
+
+export interface SocketFactoryInterface {
+    init(): void;
+    getSocketFactoryConfig(): SocketFactoryConfig;
+    close(): void;
+    shutdown(): void;
+    isClosed(): boolean;
+    isShutdown(): boolean;
+    getStats(): SocketFactoryStats;
+    onError(callback: ErrorCallback): void;
+    onServerInitError(callback: ServerInitErrorCallback): void;
+    onServerListenError(callback: ServerListenErrorCallback): void;
+    onClientInitError(callback: ClientInitErrorCallback): void;
+    onConnectError(callback: ClientConnectErrorCallback): void;
+    onConnect(callback: ConnectCallback): void;
+    onClose(callback: CloseCallback): void;
+    onRefusedClientConnection(callback: ClientRefuseCallback): void;
+}
 
 export type ClientOptions = {
     /**

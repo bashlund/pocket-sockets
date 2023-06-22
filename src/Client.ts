@@ -4,6 +4,7 @@ import {
     SocketDataCallback,
     SocketConnectCallback,
     SocketCloseCallback,
+    ClientInterface,
 } from "./types";
 
 /**
@@ -11,7 +12,7 @@ import {
  *
  * Socket specific functions need to be overridden/implemented in dervived classes.
  */
-export abstract class Client
+export abstract class Client implements ClientInterface
 {
     protected clientOptions?: ClientOptions;
     protected eventHandlers: {[key: string]: [Function[], (Buffer | undefined)[]]};
@@ -173,6 +174,10 @@ export abstract class Client
      * @param {Buffer} data
      */
     public unRead(data: Buffer) {
+        if (data.length === 0) {
+            return;
+        }
+
         const bufferData = this.clientOptions?.bufferData === undefined ? true : this.clientOptions.bufferData;
         this.triggerEvent("data", data, bufferData, true);
     }
