@@ -1,6 +1,7 @@
 # CHANGELOG: pocket-sockets
 
-## [2.0.1] - 20230628
+## [2.0.2] - 20230628
+Fix tests to consider member data attributes and other API changes
 Add missing class access modifiers.  
 Update package lock to version 2.  
 Bump dependencies based on security advisory.  
