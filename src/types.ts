@@ -63,7 +63,7 @@ export const EVENTS = {
  * These options are in EVENTS.ERROR.subEvents list.
  * @param e.e is the original event parameter(s) passed on in an object.
  */
-export type ErrorCallback = (e: {subEvent: string, e: object}) => void;
+export type ErrorCallback = (e: {subEvent: string, e: {error: Error}}) => void;
 
 /** Event emitted when client socket cannot be initaited, likely due to misconfiguration. */
 export type ClientInitErrorCallback = (e: {error: Error}) => void;
