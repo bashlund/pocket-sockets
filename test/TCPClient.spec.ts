@@ -16,12 +16,18 @@ export class TCPClientSocketConnect {
                 "port": 99,
                 "secure": true,
             });
+            //@ts-ignore: protected data
             assert(client.clientOptions!.host == "host.com");
+            //@ts-ignore: protected data
             assert(client.clientOptions!.port == 99);
+            //@ts-ignore: protected data
             assert(client.clientOptions!.secure == true);
+            //@ts-ignore: protected data
             assert(client.clientOptions!.rejectUnauthorized == null);
 
+            //@ts-ignore: protected data
             assert(client.socket == null);
+            //@ts-ignore: protected data
             assert(client.isClosed == false);
 
             //@ts-ignore: overwrite read-only
@@ -46,12 +52,18 @@ export class TCPClientSocketConnect {
                 "port": 99,
                 "secure": false,
             });
+            //@ts-ignore: protected data
             assert(client.clientOptions!.host == "host.com");
+            //@ts-ignore: protected data
             assert(client.clientOptions!.port == 99);
+            //@ts-ignore: protected data
             assert(client.clientOptions!.secure == false);
+            //@ts-ignore: protected data
             assert(client.clientOptions!.rejectUnauthorized == null);
 
+            //@ts-ignore: protected data
             assert(client.socket == null);
+            //@ts-ignore: protected data
             assert(client.isClosed == false);
 
             //@ts-ignore: overwrite read-only
@@ -89,6 +101,7 @@ export class TCPClientSocketConnect {
                 "secure": false,
             }, /*@ts-ignore*/ socket);
 
+            //@ts-ignore: protected data
             assert(client.socket != null);
 
             //@ts-ignore: protected method
@@ -108,6 +121,7 @@ export class TCPClientSocketConnect {
                 "secure": false,
             }, /*@ts-ignore*/ socket);
 
+            //@ts-ignore: protected data
             assert(client.socket != null);
             client.connect();
         }, /Socket already created./);
@@ -123,6 +137,7 @@ export class TCPClientSocketConnect {
                 "secure": false,
             });
 
+            //@ts-ignore: protected data
             client.clientOptions = undefined;
             client.connect();
         }, /clientOptions is required to create socket./);

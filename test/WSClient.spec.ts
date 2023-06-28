@@ -16,10 +16,14 @@ export class WSClientSocketConstructor {
                 "port": 99,
                 "secure": true,
             });
+            //@ts-ignore: protected data
             assert(client.clientOptions!.host == "host.com");
+            //@ts-ignore: protected data
             assert(client.clientOptions!.port == 99);
+            //@ts-ignore: protected data
             assert(client.clientOptions!.secure == true);
 
+            //@ts-ignore: protected data
             assert(client.socket == null);
         });
     }
@@ -33,10 +37,14 @@ export class WSClientSocketConstructor {
                     "port": 99,
                     "secure": false,
                 });
+                //@ts-ignore: protected data
                 assert(client.clientOptions!.host == "host.com");
+                //@ts-ignore: protected data
                 assert(client.clientOptions!.port == 99);
+                //@ts-ignore: protected data
                 assert(client.clientOptions!.secure == false);
 
+                //@ts-ignore: protected data
                 assert(client.socket == null);
             });
         });
@@ -83,13 +91,19 @@ export class WSClientSocketHook {
 
             //@ts-ignore: validate flow
             client.socketConnect();
+            //@ts-ignore: protected data
             assert(!client.socket!.onmessage);
+            //@ts-ignore: protected data
             assert(!client.socket!.onerror);
+            //@ts-ignore: protected data
             assert(!client.socket!.onclose);
             //@ts-ignore: protected method
             client.socketHook();
+            //@ts-ignore: protected data
             assert(client.socket!.onmessage);
+            //@ts-ignore: protected data
             assert(client.socket!.onerror);
+            //@ts-ignore: protected data
             assert(client.socket!.onclose);
         });
     }
@@ -102,6 +116,7 @@ export class WSClientSocketHook {
                 "port": 99,
                 "secure": false,
             });
+            //@ts-ignore: protected data
             client.socket = undefined;
             //@ts-ignore: protected method
             client.socketHook();
@@ -134,6 +149,7 @@ export class WSClientSocketConnect {
                 "port": 99,
                 "secure": false,
             });
+            //@ts-ignore: protected data
             client.clientOptions = undefined;
             //@ts-ignore: protected method
             assert(client.socketConnect());
@@ -173,6 +189,7 @@ export class WSClientSocketSend {
                 "port": 99,
                 "secure": false,
             });
+            //@ts-ignore: protected data
             client.socket = undefined;
             //@ts-ignore: protected method
             client.socketSend(Buffer.from("testdata123"));
@@ -215,6 +232,7 @@ export class WSClientSocketClose {
                 "port": 99,
                 "secure": false,
             });
+            //@ts-ignore: protected data
             client.socket = undefined;
             //@ts-ignore: protected method
             client.socketClose();

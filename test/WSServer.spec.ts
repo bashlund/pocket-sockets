@@ -53,6 +53,7 @@ export class WSServerConstructor {
                 "port": 99,
                 "cert": "valid-certificate"
             });
+            //@ts-ignore: protected data
             assert(server.wsServer == null);
         });
     }
@@ -72,6 +73,7 @@ export class WSServerConstructor {
                     "host": "host.com",
                     "port": 99,
                 });
+                //@ts-ignore: protected data
                 assert(server.wsServer == null);
             });	
     }
@@ -94,6 +96,7 @@ export class WSServerCreate {
             "port": 99,
             "cert": "valid-certificate"
         });
+        //@ts-ignore: protected data
         assert(server.server);		
     }
 
@@ -112,6 +115,7 @@ export class WSServerCreate {
                 "host": "host.com",
                 "port": 99,
             });
+            //@ts-ignore: protected data
             assert(server.server);
         });
     }
@@ -126,6 +130,7 @@ export class WSServerCreate {
                 "host": "host.com",
                 "port": 99,
             });
+            //@ts-ignore: protected data
             assert(!server.server);
         });
     }
@@ -149,6 +154,7 @@ export class WSServerListen {
                 "port": 99,
                 "cert": "valid-certificate"
             });
+            //@ts-ignore: protected data
             server.server = undefined;
             //@ts-ignore: protected method
             server.serverListen();
@@ -190,9 +196,11 @@ export class WSServerListen {
                 "port": 99,
                 "cert": "valid-certificate"
             });
+            //@ts-ignore: protected data
             assert(!server.wsServer);
             //@ts-ignore: protected method
             server.serverListen();
+            //@ts-ignore: protected data
             assert(server.wsServer);
         });
     }
@@ -259,9 +267,11 @@ export class WSServerClientConnected {
                 "host": "host.com",
                 "port": 99,
             });
+            //@ts-ignore: protected data
             assert(server.clients.length == 0);
             //@ts-ignore: protected method
             server.clientConnected(server);
+            //@ts-ignore: protected data
             assert(server.clients.length == 1);
         });
     }

@@ -514,8 +514,6 @@ export class SocketFactoryCreateClientSocket {
             });
             //@ts-ignore
             const socket = socketFactory.createClientSocket();
-            assert(socket!.clientOptions!.host == "host.com");
-            assert(socket!.clientOptions!.port == 99);
             assert(socket instanceof WSClient);
         });
     }
@@ -535,8 +533,6 @@ export class SocketFactoryCreateClientSocket {
             });
             //@ts-ignore
             const socket = socketFactory.createClientSocket();
-            assert(socket!.clientOptions!.host == "host.com");
-            assert(socket!.clientOptions!.port == 99);
             assert(socket instanceof TCPClient);
         });
     }

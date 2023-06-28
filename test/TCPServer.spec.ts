@@ -24,6 +24,7 @@ export class TCPServerConstructor {
                 "rejectUnauthorized": undefined,
                 "cert": "valid-certificate"
             });
+            //@ts-ignore: protected data
             assert(server.server);
         });
     }
@@ -43,6 +44,7 @@ export class TCPServerConstructor {
                 "host": "host.com",
                 "port": 99,
             });
+            //@ts-ignore: protected data
             assert(server.server);
         });
     }
@@ -86,6 +88,7 @@ export class TCPServerCreate {
                 "rejectUnauthorized": undefined,
                 "cert": "valid-certificate"
             });
+            //@ts-ignore: protected data
             assert(server.server);
         });
     }
@@ -106,6 +109,7 @@ export class TCPServerCreate {
                 "port": 99,
                 "rejectUnauthorized": undefined
             });
+            //@ts-ignore: protected data
             assert(server.server);
         });
     }
@@ -130,6 +134,7 @@ export class TCPServerListen {
                 "rejectUnauthorized": undefined,
                 "cert": "valid-certificate"
             });
+            //@ts-ignore: protected data
             server.server = undefined;
             //@ts-ignore: protected method
             server.serverListen();
