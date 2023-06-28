@@ -1,5 +1,12 @@
 # CHANGELOG: pocket-sockets
 
+## [2.0.1] - 20230628
+Add missing class access modifiers.  
+Update package lock to version 2.  
+Bump dependencies based on security advisory.  
+Implement ClientInterface and SocketFactoryInterface.  
+Make ErrorCallback type more specific.  
+
 ## [2.0.0] - 20221209
 Change onError callback signature (breaking).  
 Change class access modifiers from private to protected.  
