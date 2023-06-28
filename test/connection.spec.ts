@@ -1,6 +1,6 @@
 import { TestSuite, Test } from "testyts";
 import {WSClient} from "../index";
-import {WSServer, Client} from "../index";
+import {WSServer, ClientInterface} from "../index";
 
 const assert = require("assert");
 
@@ -17,7 +17,7 @@ export class Connection {
             const server = new WSServer(serverOptions);
             server.listen();
 
-            server.onConnection( (client: Client) => {
+            server.onConnection( (client: ClientInterface) => {
                 client.onData( (data: Buffer) => {
                     assert(data.toString() == "hello");
                     client.sendString("received!");
@@ -57,7 +57,7 @@ export class Connection {
             const server = new WSServer(serverOptions);
             server.listen();
 
-            server.onConnection( (client: Client) => {
+            server.onConnection( (client: ClientInterface) => {
                 client.onData( (data: Buffer) => {
                     assert(data.toString() == "hello");
                     client.sendString("received!");
@@ -97,7 +97,7 @@ export class Connection {
             const server = new WSServer(serverOptions);
             server.listen();
 
-            server.onConnection( (client: Client) => {
+            server.onConnection( (client: ClientInterface) => {
                 client.onData( (data: Buffer) => {
                     assert(data.toString() == "hello");
                     client.sendString("received!");
@@ -137,7 +137,7 @@ export class Connection {
             const server = new WSServer(serverOptions);
             server.listen();
 
-            server.onConnection( (client: Client) => {
+            server.onConnection( (client: ClientInterface) => {
                 client.onData( (data: Buffer) => {
                     assert(data.toString() == "hello");
                     client.sendString("received!");
@@ -176,7 +176,7 @@ export class Connection {
             const server = new WSServer(serverOptions);
             server.listen();
 
-            server.onConnection( (client: Client) => {
+            server.onConnection( (client: ClientInterface) => {
                 client.onData( (data: Buffer) => {
                     assert(data.toString() == "hello");
                     server.close();

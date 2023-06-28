@@ -1,6 +1,6 @@
 import { TestSuite, Test } from "testyts";
 import {TCPClient} from "../index";
-import {TCPServer, Client} from "../index";
+import {TCPServer, ClientInterface} from "../index";
 
 const assert = require("assert");
 
@@ -17,7 +17,7 @@ export class ConnectionTCP {
             const server = new TCPServer(serverOptions);
             server.listen();
 
-            server.onConnection( (client: Client) => {
+            server.onConnection( (client: ClientInterface) => {
                 client.onData( (data: Buffer) => {
                     assert(data.toString() == "hello");
                     client.sendString("received!");
@@ -57,7 +57,7 @@ export class ConnectionTCP {
             const server = new TCPServer(serverOptions);
             server.listen();
 
-            server.onConnection( (client: Client) => {
+            server.onConnection( (client: ClientInterface) => {
                 client.onData( (data: Buffer) => {
                     assert(data.toString() == "hello");
                     client.sendString("received!");
@@ -97,7 +97,7 @@ export class ConnectionTCP {
             const server = new TCPServer(serverOptions);
             server.listen();
 
-            server.onConnection( (client: Client) => {
+            server.onConnection( (client: ClientInterface) => {
                 client.onData( (data: Buffer) => {
                     assert(data.toString() == "hello");
                     client.sendString("received!");
@@ -137,7 +137,7 @@ export class ConnectionTCP {
             const server = new TCPServer(serverOptions);
             server.listen();
 
-            server.onConnection( (client: Client) => {
+            server.onConnection( (client: ClientInterface) => {
                 client.onData( (data: Buffer) => {
                     assert(data.toString() == "hello");
                     client.sendString("received!");
@@ -176,7 +176,7 @@ export class ConnectionTCP {
             const server = new TCPServer(serverOptions);
             server.listen();
 
-            server.onConnection( (client: Client) => {
+            server.onConnection( (client: ClientInterface) => {
                 client.onData( (data: Buffer) => {
                     assert(data.toString() == "hello");
                     server.close();

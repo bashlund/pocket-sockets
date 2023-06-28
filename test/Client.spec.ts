@@ -16,17 +16,27 @@ export class ClientConstructor {
                 "port": 99
             });
 
+            //@ts-ignore: protected data
             assert(client.clientOptions!.host == "host.com");
+            //@ts-ignore: protected data
             assert(client.clientOptions!.port == 99);
 
+            //@ts-ignore: protected data
             assert(client.isClosed == false);
+            //@ts-ignore: protected data
             assert(Object.keys(client.eventHandlers).length == 0);
 
+            //@ts-ignore: protected data
             assert(client.clientOptions!.bufferData == undefined);
+            //@ts-ignore: protected data
             assert(client.clientOptions!.secure == undefined);
+            //@ts-ignore: protected data
             assert(client.clientOptions!.rejectUnauthorized == undefined);
+            //@ts-ignore: protected data
             assert(client.clientOptions!.cert == undefined);
+            //@ts-ignore: protected data
             assert(client.clientOptions!.key == undefined);
+            //@ts-ignore: protected data
             assert(client.clientOptions!.ca == undefined);
         });
     }
@@ -127,6 +137,7 @@ export class ClientSend {
                 "host": "host.com",
                 "port": 99,
             });
+            //@ts-ignore: protected data
             client.isClosed = true;
             client.send(Buffer.from("testdata"));
             assert(flag == false);
@@ -185,6 +196,7 @@ export class ClientClose {
                 "host": "host.com",
                 "port": 99,
             });
+            //@ts-ignore: protected data
             client.isClosed = true;
             client.close();
             assert(flag == false);
@@ -484,9 +496,11 @@ export class ClientOn {
                 "host": "host.com",
                 "port": 99,
             });
+            //@ts-ignore: protected data
             assert(!client.eventHandlers["myevent"]);
             //@ts-ignore
             client.on("myevent", function(){});
+            //@ts-ignore: protected data
             assert(client.eventHandlers["myevent"]);
         });
     }
@@ -511,6 +525,7 @@ export class ClientOff {
             const fn = function(){};
             //@ts-ignore
             client.on("myevent", fn);
+            //@ts-ignore: protected data
             assert(client.eventHandlers["myevent"]);
             //@ts-ignore
             client.off("myevent", fn);
@@ -540,8 +555,10 @@ export class ClientCloseInner {
                 "port": 99,
             });
             assert(flag == false);
+            //@ts-ignore: protected data
             assert(client.isClosed == false);
             client.close();
+            //@ts-ignore: protected data
             assert(client.isClosed == true);
         });
     }
@@ -649,12 +666,19 @@ export class ClientValidateConfig {
                 "ca": "myca",
             });
 
+            //@ts-ignore: protected data
             assert(client.clientOptions!.host == "host.com");
+            //@ts-ignore: protected data
             assert(client.clientOptions!.port == 99);
+            //@ts-ignore: protected data
             assert(client.clientOptions!.secure == undefined);
+            //@ts-ignore: protected data
             assert(client.clientOptions!.rejectUnauthorized == undefined);
+            //@ts-ignore: protected data
             assert(client.clientOptions!.cert == "mycert");
+            //@ts-ignore: protected data
             assert(client.clientOptions!.key == "mykey");
+            //@ts-ignore: protected data
             assert(client.clientOptions!.ca == "myca");
         });
     }
@@ -684,9 +708,11 @@ export class ClientSocketClosed {
                 "port": 99,
             });
             assert(flagOnEvent == false);
+            //@ts-ignore: protected data
             assert(client.isClosed == false);
             //@ts-ignore: protected method
             client.socketClosed(true);
+            //@ts-ignore: protected data
             assert(client.isClosed == true);
             assert(flagOnEvent == true);
         });
