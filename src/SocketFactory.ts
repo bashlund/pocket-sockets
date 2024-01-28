@@ -9,9 +9,9 @@ if(typeof "process" === "undefined" && !process && !process.versions && !process
 }
 else {
     // Import nodejs modules.
-    TCPClient = require("./TCPClient").TCPClient;
-    WSServer  = require("./WSServer").WSServer;
-    TCPServer = require("./TCPServer").TCPServer;
+    TCPClient = require("./TCPClient").TCPClient;  //eslint-disable-line @typescript-eslint/no-var-requires
+    WSServer  = require("./WSServer").WSServer;  //eslint-disable-line @typescript-eslint/no-var-requires
+    TCPServer = require("./TCPServer").TCPServer;  //eslint-disable-line @typescript-eslint/no-var-requires
 }
 
 import {
@@ -59,7 +59,7 @@ import {
 export class SocketFactory implements SocketFactoryInterface {
     protected config: SocketFactoryConfig;
     protected stats: SocketFactoryStats;
-    protected handlers: {[type: string]: Function[]};
+    protected handlers: {[type: string]: ((data?: any) => void)[]};
     protected serverClientSockets: ClientInterface[];
     protected serverSocket?: Server;
     protected clientSocket?: ClientInterface;
@@ -241,7 +241,8 @@ export class SocketFactory implements SocketFactoryInterface {
         }
 
         this.serverSocket.onConnection( async (socket: ClientInterface) => {
-            let clientIP = socket.getRemoteAddress();
+            const clientIP = socket.getRemoteAddress();
+
             if (clientIP) {
                 if (this.isDenied(clientIP)) {
                     socket.close();
@@ -317,7 +318,8 @@ export class SocketFactory implements SocketFactoryInterface {
      * @params isServer set to true if it is server socket checking.
      * @returns true if any limit is reached.
      */
-    protected checkConnectionsOverflow(address: string, isServer: boolean = false): boolean {
+    protected checkConnectionsOverflow(address: string, isServer: boolean = false): boolean //eslint-disable-line @typescript-eslint/no-unused-vars
+    {
         if (this.config.maxConnections !== undefined) {
             const allCount = this.readCounter("*");
             if (allCount >= this.config.maxConnections) {
@@ -471,20 +473,22 @@ export class SocketFactory implements SocketFactoryInterface {
         this.hookEvent(EVENTS.CLIENT_REFUSE.name, callback);
     }
 
-    protected hookEvent(type: string, callback: Function) {
+    protected hookEvent(type: string, callback: (data?: any) => void) {
         const cbs = this.handlers[type] || [];
         this.handlers[type] = cbs;
         cbs.push(callback);
     }
 
-    protected unhookEvent(type: string, callback: Function) {
-        const cbs = (this.handlers[type] || []).filter( (cb: Function) => callback !== cb );
+    protected unhookEvent(type: string, callback: (data?: any) => void) {
+        const cbs = (this.handlers[type] || []).filter( (cb: (data?: any[]) => void) =>
+            callback !== cb );
+
         this.handlers[type] = cbs;
     }
 
     protected triggerEvent(type: string, ...args: any) {
         const cbs = this.handlers[type] || [];
-        cbs.forEach( (callback: Function) => {
+        cbs.forEach( callback => {
             callback(...args);
         });
     }

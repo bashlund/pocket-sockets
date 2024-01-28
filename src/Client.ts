@@ -15,7 +15,7 @@ import {
 export abstract class Client implements ClientInterface
 {
     protected clientOptions?: ClientOptions;
-    protected eventHandlers: {[key: string]: [Function[], (Buffer | undefined)[]]};
+    protected eventHandlers: {[key: string]: [((data: any) => void)[], (Buffer | undefined)[]]};
     protected isClosed: boolean;
 
     constructor(clientOptions: ClientOptions) {
@@ -204,7 +204,7 @@ export abstract class Client implements ClientInterface
      * Send the given buffer on socket.
      * Socket specific implementation.
      */
-    protected socketSend(data: Buffer | string) {
+    protected socketSend(data: Buffer | string) {  // eslint-disable-line @typescript-eslint/no-unused-vars
         throw new Error("Function not implemented.");
     }
 
@@ -264,8 +264,8 @@ export abstract class Client implements ClientInterface
      * @param {Function} fn - callback.
      *
      */
-    protected off(event: string, fn: Function) {
-        const [fns, queue] = (this.eventHandlers[event] || [[], []]);
+    protected off(event: string, fn: (data: any) => void) {
+        const [fns] = (this.eventHandlers[event] || [[], []]);
         const index = fns.indexOf(fn);
         if (index > -1) {
             fns.splice(index, 1);
@@ -279,7 +279,7 @@ export abstract class Client implements ClientInterface
      * @param {Function} fn - callback.
      *
      */
-    protected on(event: string, fn: Function) {
+    protected on(event: string, fn: (data: any) => void) {
         const tuple = (this.eventHandlers[event] || [[], []]);
         this.eventHandlers[event] = tuple;
         const [fns, queue] = tuple;
@@ -318,7 +318,7 @@ export abstract class Client implements ClientInterface
             }
         }
         else {
-            fns.forEach( (fn: Function) => {
+            fns.forEach( (fn) => {
                 fn(data);
             });
         }

@@ -15,7 +15,7 @@ import {
 export abstract class Server
 {
     protected serverOptions: ServerOptions;
-    protected eventHandlers: {[key: string]: Function[]};
+    protected eventHandlers: {[key: string]: ((data: any) => void)[]};
     protected isClosed: boolean;
     protected clients: ClientInterface[];
 
@@ -153,7 +153,7 @@ export abstract class Server
      * @param {string} event
      * @param {Function} fn
      */
-    public on(event: string, fn: Function) {
+    public on(event: string, fn: (data: any) => void) {
         const fns = this.eventHandlers[event] || [];
         this.eventHandlers[event] = fns;
         fns.push(fn);
