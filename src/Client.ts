@@ -24,6 +24,14 @@ export abstract class Client implements ClientInterface
         this.isClosed = false;
     }
 
+    public getSocket(): any {
+        throw new Error("Function not implemented.");
+    }
+
+    public isWebSocket(): boolean {
+        return false;
+    }
+
     /**
      * Connect to server.
      *

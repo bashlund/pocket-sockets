@@ -20,6 +20,14 @@ export class TCPClient extends Client
         }
     }
 
+    public getSocket(): net.Socket {
+        if (!this.socket) {
+            throw new Error("Socket not initiated.");
+        }
+
+        return this.socket;
+    }
+
     /**
      * @return {string | undefined} local IP address
      */

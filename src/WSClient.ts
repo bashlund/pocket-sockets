@@ -47,6 +47,18 @@ export class WSClient extends Client
         }
     }
 
+    public getSocket(): ws {
+        if (!this.socket) {
+            throw new Error("Socket not initiated.");
+        }
+
+        return this.socket;
+    }
+
+    public isWebSocket(): boolean {
+        return true;
+    }
+
     /**
      * Note this does always return undefined in browser.
      * @return {string | undefined} local IP address

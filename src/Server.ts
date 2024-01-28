@@ -31,6 +31,10 @@ export abstract class Server
      *
      */
     public listen() {
+        if (this.serverOptions.port === 0) {
+            throw new Error("Server socket not allowed to listen to port 0.");
+        }
+
         this.serverListen();
     }
 

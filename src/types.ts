@@ -93,6 +93,8 @@ export interface ClientInterface {
     connect(): void;
     send(data: Buffer | string): void;
     close(): void;
+    getSocket(): any;
+    isWebSocket(): boolean;
     onError(fn: SocketErrorCallback): void;
     offError(fn: SocketErrorCallback): void;
     onData(fn: SocketDataCallback): void;
@@ -188,6 +190,7 @@ export type ServerOptions = {
 
     /**
      * TCP port number to listen to.
+     * Listening to port 0 is not allowed.
      * Required.
      */
     port: number,
