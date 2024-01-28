@@ -8,7 +8,7 @@ export class ByteSize
 {
     protected client: ClientInterface;
     protected data: Buffer;
-    protected resolve?: Function;
+    protected resolve?: (data: Buffer) => void;
     protected reject?: Function;
     protected ended: boolean;
     protected nrBytes?: number;
@@ -52,10 +52,15 @@ export class ByteSize
         }
     }
 
-    protected onData = (buf: Buffer) => {
+    protected onData = (buf: Buffer | string) => {
         if (this.ended) {
             return;
         }
+
+        if (typeof(buf) === "string") {
+            buf = Buffer.from(buf);
+        }
+
         this.data = Buffer.concat([this.data, buf]);
         if (!this.resolve) {
             return;

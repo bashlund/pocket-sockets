@@ -169,10 +169,12 @@ export class WSClient extends Client
         this.socket.onmessage = (msg: any) => {
             let data = msg.data;
 
-            // Under Browser settings, convert message data from ArrayBuffer to Buffer.
-            if (isBrowser) {
-                const bytes = new Uint8Array(data);
-                data = Buffer.from(bytes);
+            if (typeof(data) !== "string") {
+                // Under Browser settings, convert message data from ArrayBuffer to Buffer.
+                if (isBrowser) {
+                    const bytes = new Uint8Array(data);
+                    data = Buffer.from(bytes);
+                }
             }
 
             this.socketData(data);
@@ -183,11 +185,21 @@ export class WSClient extends Client
 
     /**
      * Defines how data gets written to the socket.
-     * @param {Buffer} buffer - data to be sent
+     * @param {data} buffer or string - data to be sent
+     *  strings are sent as UTF-8 text, Buffers as binary.
      */
-    protected socketSend(buffer: Buffer) {
+    protected socketSend(data: Buffer | string) {
+        if ( typeof(data) !== "string" && !(data instanceof Buffer)) {
+            throw new Error("Data must be of string or Buffer type.");
+        }
+
         if (this.socket) {
-            this.socket.send(buffer, {binary: true, compress: false});
+            if (typeof(data) === "string") {
+                this.socket.send(data, {binary: false, compress: false});
+            }
+            else {
+                this.socket.send(data, {binary: true, compress: false});
+            }
         }
     }
 

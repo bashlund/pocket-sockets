@@ -34,25 +34,17 @@ export abstract class Client implements ClientInterface
     }
 
     /**
-     * Send string on socket.
-     *
-     */
-    public sendString(data: string) {
-        this.send(Buffer.from(data));
-    }
-
-    /**
      * Send buffer on socket.
      *
-     * @param {Buffer} data to be sent
+     * @param {data} data to be sent
      * @throws An error will be thrown when buffer data type is incompatible.
      */
-    public send(data: Buffer) {
+    public send(data: Buffer | string) {
         if (this.isClosed) {
             return;
         }
 
-        if ( !(data instanceof Buffer)) {
+        if ( typeof(data) !== "string" && !(data instanceof Buffer)) {
             throw new Error("Data must be of Buffer type.");
         }
 
@@ -178,7 +170,9 @@ export abstract class Client implements ClientInterface
             return;
         }
 
-        const bufferData = this.clientOptions?.bufferData === undefined ? true : this.clientOptions.bufferData;
+        const bufferData = this.clientOptions?.bufferData === undefined ? true :
+            this.clientOptions.bufferData;
+
         this.triggerEvent("data", data, bufferData, true);
     }
 
@@ -202,7 +196,7 @@ export abstract class Client implements ClientInterface
      * Send the given buffer on socket.
      * Socket specific implementation.
      */
-    protected socketSend(buffer: Buffer) {
+    protected socketSend(data: Buffer | string) {
         throw new Error("Function not implemented.");
     }
 
@@ -227,12 +221,14 @@ export abstract class Client implements ClientInterface
      * @param {Buffer} data - data buffer.
      *
      */
-    protected socketData = (data: Buffer) => {
-        if ( !(data instanceof Buffer)) {
-            throw new Error("Must read buffer.");
+    protected socketData = (data: Buffer | string) => {
+        if ( !(data instanceof Buffer) && typeof(data) !== "string") {
+            throw new Error("Must read Buffer or string.");
         }
 
-        const bufferData = this.clientOptions?.bufferData === undefined ? true : this.clientOptions.bufferData;
+        const bufferData = this.clientOptions?.bufferData === undefined ? true :
+            this.clientOptions.bufferData;
+
         this.triggerEvent("data", data, bufferData);
     }
 

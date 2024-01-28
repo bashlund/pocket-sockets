@@ -9,7 +9,7 @@ export class VirtualClient extends Client
 {
     protected pairedSocket?: VirtualClient;
     protected latency: number;
-    protected outQueue: Buffer[];
+    protected outQueue: (Buffer | string)[];
     protected remoteAddress: string | undefined;
     protected localAddress: string | undefined;
     protected remotePort: number | undefined;
@@ -108,13 +108,13 @@ export class VirtualClient extends Client
     }
 
     /**
-     * Send the given buffer on socket.
-     * @param {Buffer} buffer
+     * Send the given data on socket.
+     * @param {Buffer | string} data
      */
-    protected socketSend(buffer: Buffer) {
+    protected socketSend(data: Buffer | string) {
         // Put msg into paired socket.
         if (this.pairedSocket) {
-            this.outQueue.push(buffer);
+            this.outQueue.push(data);
             if (this.latency > 0) {
                 setTimeout( () => this.copyToPaired(), this.latency);
             } else {
@@ -140,9 +140,9 @@ export class VirtualClient extends Client
      */
     protected copyToPaired() {
         if (this.pairedSocket) {
-            const buffer = this.outQueue.shift();
-            if (buffer) {
-                this.pairedSocket.socketData(buffer);
+            const data = this.outQueue.shift();
+            if (data !== undefined) {
+                this.pairedSocket.socketData(data);
             }
         }
     }

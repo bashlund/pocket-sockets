@@ -168,7 +168,7 @@ export class ClientSendString {
                 "host": "host.com",
                 "port": 99,
             });
-            client.sendString("testdata");
+            client.send("testdata");
             assert(flag == true);
         });
     }

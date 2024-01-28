@@ -2,7 +2,7 @@
 export type SocketErrorCallback = (message: string) => void;
 
 /** Event emitted on incoming data on socket. */
-export type SocketDataCallback = (data: Buffer) => void;
+export type SocketDataCallback = (data: Buffer | string) => void;
 
 /** Event emitted on socket connected. */
 export type SocketConnectCallback = () => void;
@@ -91,8 +91,7 @@ export type ClientRefuseCallback = (e: {reason: string, key: string}) => void;
 
 export interface ClientInterface {
     connect(): void;
-    sendString(data: string): void;
-    send(data: Buffer): void;
+    send(data: Buffer | string): void;
     close(): void;
     onError(fn: SocketErrorCallback): void;
     offError(fn: SocketErrorCallback): void;

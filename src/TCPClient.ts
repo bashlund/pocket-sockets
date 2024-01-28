@@ -113,11 +113,21 @@ export class TCPClient extends Client
 
     /**
      * Defines how data gets written to the socket.
-     * @param {Buffer} buffer - data to be sent
+     *
+     * @param {data} Buffer or string - data to be sent
      */
-    protected socketSend(buffer: Buffer) {
+    protected socketSend(data: Buffer | string) {
+        if ( typeof(data) !== "string" && !(data instanceof Buffer)) {
+            throw new Error("Data must be of string or Buffer type.");
+        }
+
         if (this.socket) {
-            this.socket.write(buffer);
+            if (typeof(data) === "string") {
+                this.socket.write(Buffer.from(data));
+            }
+            else {
+                this.socket.write(data);
+            }
         }
     }
 

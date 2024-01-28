@@ -145,7 +145,7 @@ export class VirtualClientCopyToPaired {
             let copiedBuffer: Buffer;
             //@ts-ignore
             client2.socketData = function(buffer) {
-                if(buffer) {
+                if(Buffer.isBuffer(buffer)) {
                     copiedBuffer = buffer;
                 }
             }
