@@ -35,7 +35,7 @@
   "scripts": {
     "test": "./node_modules/.bin/testyts",
     "docs": "./node_modules/.bin/typedoc --entryDocument Home.md --hideBreadcrumbs true --hideInPageTOC true --cleanOutputDir false ./src/*.ts",
-    "c": "./node_modules/.bin/tsc",
+    "build": "./node_modules/.bin/tsc",
     "prepublishOnly": "tsc"
   },
   "dependencies": {
