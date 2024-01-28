@@ -49,7 +49,7 @@ export class WSClient extends Client
 
     public getSocket(): ws {
         if (!this.socket) {
-            throw new Error("Socket not initiated.");
+            throw new Error("Socket not initiated");
         }
 
         return this.socket;
@@ -112,11 +112,11 @@ export class WSClient extends Client
      */
     protected socketConnect() {
         if (this.socket) {
-            throw new Error("Socket already created.");
+            throw new Error("Socket already created");
         }
 
         if (!this.clientOptions) {
-            throw new Error("clientOptions is required to create socket.");
+            throw new Error("clientOptions is required to create socket");
         }
 
         let host = this.clientOptions.host ? this.clientOptions.host : "localhost";
@@ -166,7 +166,7 @@ export class WSClient extends Client
             this.socket.onopen = this.socketConnected;
         }
         else {
-            throw new Error("Could not create socket.");
+            throw new Error("Could not create socket");
         }
     }
 
@@ -202,7 +202,7 @@ export class WSClient extends Client
      */
     protected socketSend(data: Buffer | string) {
         if ( typeof(data) !== "string" && !(data instanceof Buffer)) {
-            throw new Error("Data must be of string or Buffer type.");
+            throw new Error("Data must be of string or Buffer type");
         }
 
         if (this.socket) {

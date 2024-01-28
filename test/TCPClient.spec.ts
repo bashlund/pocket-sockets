@@ -124,7 +124,7 @@ export class TCPClientSocketConnect {
             //@ts-ignore: protected data
             assert(client.socket != null);
             client.connect();
-        }, /Socket already created./);
+        }, /Socket already created/);
     }
 
     @Test()
@@ -140,7 +140,7 @@ export class TCPClientSocketConnect {
             //@ts-ignore: protected data
             client.clientOptions = undefined;
             client.connect();
-        }, /clientOptions is required to create socket./);
+        }, /clientOptions is required to create socket/);
     }
 
 

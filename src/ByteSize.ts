@@ -9,7 +9,7 @@ export class ByteSize
     protected client: ClientInterface;
     protected data: Buffer;
     protected resolve?: (data: Buffer) => void;
-    protected reject?: Function;
+    protected reject?: (error: Error) => void;
     protected ended: boolean;
     protected nrBytes?: number;
     protected timeoutId?: ReturnType<typeof setTimeout>;
@@ -33,7 +33,7 @@ export class ByteSize
                 if (this.reject) {
                     const reject = this.reject;
                     this.end();
-                    reject("Timeout");
+                    reject(new Error("Timeout"));
                 }
             }, timeout);
         }
@@ -48,7 +48,7 @@ export class ByteSize
         if (this.reject) {
             const reject = this.reject;
             this.end();
-            reject("Socket closed");
+            reject(new Error("Socket closed"));
         }
     }
 
