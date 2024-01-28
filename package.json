@@ -36,6 +36,7 @@
     "test": "./node_modules/.bin/testyts",
     "docs": "./node_modules/.bin/typedoc --entryDocument Home.md --hideBreadcrumbs true --hideInPageTOC true --cleanOutputDir false ./src/*.ts",
     "build": "./node_modules/.bin/tsc",
+    "tsc": "./node_modules/.bin/tsc",
     "lint": "npx eslint ./src",
     "prepublishOnly": "tsc"
   },
