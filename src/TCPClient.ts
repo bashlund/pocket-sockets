@@ -125,17 +125,15 @@ export class TCPClient extends Client
      * @param {data} Buffer or string - data to be sent
      */
     protected socketSend(data: Buffer | string) {
-        if ( typeof(data) !== "string" && !(data instanceof Buffer)) {
-            throw new Error("Data must be of string or Buffer type.");
+        if (!this.socket) {
+            throw new Error("Socket not instantiated");
         }
 
-        if (this.socket) {
-            if (typeof(data) === "string") {
-                this.socket.write(Buffer.from(data));
-            }
-            else {
-                this.socket.write(data);
-            }
+        if (!Buffer.isBuffer(data)) {
+            this.socket.write(Buffer.from(data));
+        }
+        else {
+            this.socket.write(data);
         }
     }
 

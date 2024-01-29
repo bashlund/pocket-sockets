@@ -33,6 +33,13 @@ export abstract class Client implements ClientInterface
     }
 
     /**
+     * @returns true if set to text mode, false if binary mode (default).
+     */
+    public isTextMode(): boolean {
+        return this.clientOptions?.textMode ?? false;
+    }
+
+    /**
      * Connect to server.
      *
      */
@@ -45,15 +52,22 @@ export abstract class Client implements ClientInterface
      * Send buffer on socket.
      *
      * @param {data} data to be sent
+     *  For TCP sockets strings are always converted to Buffers before sending.
+     *
+     *  For WebSockets in binary mode strings are converted to Buffers before sending.
+     *
+     *  For WebSockets in binary mode Buffers are sent as they are in binary mode on the WebSocket.
+     *
+     *  For WebSockets in text mode strings are sent as they are in text mode on the WebSocket.
+     *
+     *  For WebSockets in text mode Buffers are converted into strings and sent in text mode
+     *  on the WebSocket.
+     *
      * @throws An error will be thrown when buffer data type is incompatible.
      */
     public send(data: Buffer | string) {
         if (this.isClosed) {
             return;
-        }
-
-        if ( typeof(data) !== "string" && !(data instanceof Buffer)) {
-            throw new Error("Data must be of Buffer type.");
         }
 
         this.socketSend(data);
@@ -92,6 +106,9 @@ export abstract class Client implements ClientInterface
 
     /**
      * User hook for incoming data.
+     *
+     * For sockets in binary mode data in the callback is always Buffer.
+     * For sockets in text mode data in the callback is always string.
      *
      * @param {Function} fn - on data callback. Function is passed a Buffer object.
      */
@@ -173,7 +190,18 @@ export abstract class Client implements ClientInterface
      * Unread data by putting it back into the event queue.
      * @param {Buffer} data
      */
-    public unRead(data: Buffer) {
+    public unRead(data: Buffer | string) {
+        if (this.isTextMode()) {
+            if (typeof(data) !== "string") {
+                throw new Error("unRead expecting string in text mode");
+            }
+        }
+        else {
+            if (!Buffer.isBuffer(data)) {
+                throw new Error("unRead expecting Buffer in binary mode");
+            }
+        }
+
         if (data.length === 0) {
             return;
         }
@@ -230,8 +258,15 @@ export abstract class Client implements ClientInterface
      *
      */
     protected socketData = (data: Buffer | string) => {
-        if ( !(data instanceof Buffer) && typeof(data) !== "string") {
-            throw new Error("Must read Buffer or string.");
+        if (this.isTextMode()) {
+            if (Buffer.isBuffer(data)) {
+                data = data.toString();
+            }
+        }
+        else {
+            if (typeof(data) === "string") {
+                data = Buffer.from(data);
+            }
         }
 
         const bufferData = this.clientOptions?.bufferData === undefined ? true :

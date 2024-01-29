@@ -1,7 +1,7 @@
 /** Event emitted on client socket connect error. */
 export type SocketErrorCallback = (message: string) => void;
 
-/** Event emitted on incoming data on socket. */
+/** Event emitted on incoming binary data on socket. */
 export type SocketDataCallback = (data: Buffer | string) => void;
 
 /** Event emitted on socket connected. */
@@ -95,6 +95,7 @@ export interface ClientInterface {
     close(): void;
     getSocket(): any;
     isWebSocket(): boolean;
+    isTextMode(): boolean;
     onError(fn: SocketErrorCallback): void;
     offError(fn: SocketErrorCallback): void;
     onData(fn: SocketDataCallback): void;
@@ -107,7 +108,7 @@ export interface ClientInterface {
     getRemoteAddress(): string | undefined;
     getRemotePort(): number | undefined;
     getLocalPort(): number | undefined;
-    unRead(data: Buffer): void;
+    unRead(data: Buffer | string): void;
 }
 
 export interface SocketFactoryInterface {
@@ -148,6 +149,30 @@ export type ClientOptions = {
      * data gets buffered until the new owner does socket.onData(...).
      */
     bufferData?: boolean,
+
+    /**
+     * Set to true to have the socket in text mode (default is false).
+     *
+     * If set and data is received on TCP socket that data is translated into text and emitted
+     * as string on onData() handler.
+     *
+     * If set and binary data is received on WebSocket that data translated into text and emitted
+     * as string on onData() handler.
+     *
+     * If set and textual data is received on WebSocket that data is not transformed but emitted
+     * as it is as string on onData() handler.
+     *
+     *
+     * When not in text mode, data received on TCP socket is emitted as Buffer on the
+     * onData() handler.
+     *
+     * When not in text mode and data received on WebSocket is binary, the data is emitted as Buffer
+     * on the onData() handler.
+     *
+     * When not in text mode and data received on WebSocket is text, the data is transformed into
+     * Buffer and emitted on the onData() handler.
+     */
+    textMode?: boolean,
 
     /**
      * Set to true to connect over TLS.
@@ -204,6 +229,12 @@ export type ServerOptions = {
      * This parameter applies to the client sockets accepted on new connections.
      */
     bufferData?: boolean,
+
+    /**
+     * If set then set it for all accepted sockets.
+     * See ClientOptions.textMode for details.
+     */
+    textMode?: boolean,
 
     /**
      * Set to true to only listen to IPv6 addresses.

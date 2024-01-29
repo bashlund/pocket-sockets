@@ -1,5 +1,6 @@
 /**
  * This can be used to await X nr of bytes on the client socket.
+ * It is allowed to use text mode sockets, but the data resolve will always be as Buffer.
  *
  */
 import {ClientInterface} from "./types";
@@ -57,7 +58,7 @@ export class ByteSize
             return;
         }
 
-        if (typeof(buf) === "string") {
+        if (!Buffer.isBuffer(buf)) {
             buf = Buffer.from(buf);
         }
 
@@ -87,6 +88,11 @@ export class ByteSize
         this.client.offClose(this.onClose);
         delete this.reject;
         delete this.resolve;
-        this.client.unRead(this.data);
+        if (this.client.isTextMode()) {
+            this.client.unRead(this.data.toString());
+        }
+        else {
+            this.client.unRead(this.data);
+        }
     }
 }

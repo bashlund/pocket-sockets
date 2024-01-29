@@ -192,7 +192,8 @@ export class WSClientSocketSend {
             //@ts-ignore: protected data
             client.socket = undefined;
             //@ts-ignore: protected method
-            client.socketSend(Buffer.from("testdata123"));
+            assert.throws( () => client.socketSend(Buffer.from("testdata123")),
+                /Socket not instantiated/ );
         });
     }
 
