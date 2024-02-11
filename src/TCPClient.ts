@@ -11,7 +11,7 @@ export class TCPClient extends Client
 {
     protected socket?: net.Socket;
 
-    constructor(clientOptions: ClientOptions, socket?: net.Socket) {
+    constructor(clientOptions?: ClientOptions, socket?: net.Socket) {
         super(clientOptions);
         this.socket = socket;
 

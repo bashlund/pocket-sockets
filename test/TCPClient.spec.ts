@@ -28,7 +28,7 @@ export class TCPClientSocketConnect {
             //@ts-ignore: protected data
             assert(client.socket == null);
             //@ts-ignore: protected data
-            assert(client.isClosed == false);
+            assert(client._isClosed == false);
 
             //@ts-ignore: overwrite read-only
             tls.connect = function() {
@@ -64,7 +64,7 @@ export class TCPClientSocketConnect {
             //@ts-ignore: protected data
             assert(client.socket == null);
             //@ts-ignore: protected data
-            assert(client.isClosed == false);
+            assert(client._isClosed == false);
 
             //@ts-ignore: overwrite read-only
             net.connect = function() {

@@ -38,11 +38,15 @@ export class WSClient extends Client
 {
     protected socket?: ws;
 
-    constructor(clientOptions: ClientOptions, socket?: ws) {
+    constructor(clientOptions?: ClientOptions, socket?: ws) {
         super(clientOptions);
         this.socket = socket;
 
         if (this.socket) {
+            if (isBrowser) {
+                this.socket.binaryType = "arraybuffer";
+            }
+
             this.socketHook();
         }
     }

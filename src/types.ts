@@ -90,9 +90,11 @@ export type ServerListenErrorCallback = (error: Error) => void;
 export type ClientRefuseCallback = (e: {reason: string, key: string}) => void;
 
 export interface ClientInterface {
+    init(): Promise<void>;
     connect(): void;
     send(data: Buffer | string): void;
     close(): void;
+    isClosed(): boolean;
     getSocket(): any;
     isWebSocket(): boolean;
     isTextMode(): boolean;

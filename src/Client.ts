@@ -16,12 +16,19 @@ export abstract class Client implements ClientInterface
 {
     protected clientOptions?: ClientOptions;
     protected eventHandlers: {[key: string]: [((data: any) => void)[], (Buffer | undefined)[]]};
-    protected isClosed: boolean;
+    protected _isClosed: boolean = false;
 
-    constructor(clientOptions: ClientOptions) {
+    constructor(clientOptions?: ClientOptions) {
         this.clientOptions  = clientOptions;
         this.eventHandlers  = {};
-        this.isClosed = false;
+    }
+
+    /**
+     * This should be called on (wrapped) clients before using.
+     * For regular TCP and WebSocket clients this function does nothing.
+     */
+    public async init() {
+        // Do nothing, but allows wrapping sockets to do something.
     }
 
     public getSocket(): any {
@@ -66,7 +73,7 @@ export abstract class Client implements ClientInterface
      * @throws An error will be thrown when buffer data type is incompatible.
      */
     public send(data: Buffer | string) {
-        if (this.isClosed) {
+        if (this._isClosed) {
             return;
         }
 
@@ -77,11 +84,15 @@ export abstract class Client implements ClientInterface
      * Close socket.
      */
     public close() {
-        if (this.isClosed) {
+        if (this._isClosed) {
             return;
         }
 
         this.socketClose();
+    }
+
+    public isClosed(): boolean {
+        return this._isClosed;
     }
 
     /**
@@ -247,7 +258,7 @@ export abstract class Client implements ClientInterface
      * Base close event procedure responsible for triggering the close event.
      */
     protected socketClosed = (hadError: boolean) => {
-        this.isClosed = true;
+        this._isClosed = true;
         this.triggerEvent("close", hadError);
     }
 
