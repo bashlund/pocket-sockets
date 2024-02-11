@@ -131,6 +131,10 @@ export interface SocketFactoryInterface {
     onRefusedClientConnection(callback: ClientRefuseCallback): void;
 }
 
+export interface WrappedClientInterface extends ClientInterface {
+    getClient(): ClientInterface;
+}
+
 export type ClientOptions = {
     /**
      * RFC6066 states that this should not be an IP address but a name when using TLS.
