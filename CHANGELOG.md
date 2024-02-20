@@ -1,5 +1,15 @@
 # CHANGELOG: pocket-sockets
 
+## [3.0.0] - 20240220
+Add text-mode options to socket.  
+Add WrappedClient to allow for more complex clients.  
+Add helper functions getSocket and isWebSocket to ClientInterface.  
+Block possibility to listen to port 0.  
+Add linting.  
+Add ClientInterface.isClosed() and Server.isClosed().  
+Add ClientInterface.init() to allow for other more complex clients.  
+Add WrappedClient to allow wrapping a Client object.  
+
 ## [2.0.2] - 20230628
 Fix tests to consider member data attributes and other API changes
 Add missing class access modifiers.  
