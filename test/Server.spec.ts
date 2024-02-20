@@ -42,7 +42,7 @@ export class ServerConstructor {
             //@ts-ignore: protected data
             assert(Object.keys(server.eventHandlers).length == 0);
             //@ts-ignore: protected data
-            assert(server.isClosed == false);
+            assert(server._isClosed == false);
         });
     }
 

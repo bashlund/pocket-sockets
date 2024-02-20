@@ -18,9 +18,9 @@ export class Connection {
             server.listen();
 
             server.onConnection( (client: ClientInterface) => {
-                client.onData( (data: Buffer) => {
+                client.onData( (data: Buffer | string) => {
                     assert(data.toString() == "hello");
-                    client.sendString("received!");
+                    client.send("received!");
                 });
                 client.onClose( () => {
                     server.close();
@@ -36,13 +36,13 @@ export class Connection {
             client.connect();
 
             client.onConnect( () => {
-                client.onData( (data: Buffer) => {
+                client.onData( (data: Buffer | string) => {
                     assert(data.toString() == "received!");
                     client.close();
                 });
                 client.onClose( () => {
                 });
-                client.sendString("hello");
+                client.send("hello");
             });
         });
     }
@@ -58,9 +58,9 @@ export class Connection {
             server.listen();
 
             server.onConnection( (client: ClientInterface) => {
-                client.onData( (data: Buffer) => {
+                client.onData( (data: Buffer | string) => {
                     assert(data.toString() == "hello");
-                    client.sendString("received!");
+                    client.send("received!");
                 });
                 client.onClose( () => {
                     server.close();
@@ -76,13 +76,13 @@ export class Connection {
             client.connect();
 
             client.onConnect( () => {
-                client.onData( (data: Buffer) => {
+                client.onData( (data: Buffer | string) => {
                     assert(data.toString() == "received!");
                     client.close();
                 });
                 client.onClose( () => {
                 });
-                client.sendString("hello");
+                client.send("hello");
             });
         });
     }
@@ -98,9 +98,9 @@ export class Connection {
             server.listen();
 
             server.onConnection( (client: ClientInterface) => {
-                client.onData( (data: Buffer) => {
+                client.onData( (data: Buffer | string) => {
                     assert(data.toString() == "hello");
-                    client.sendString("received!");
+                    client.send("received!");
                 });
                 client.onClose( () => {
                     server.close();
@@ -116,13 +116,13 @@ export class Connection {
             client.connect();
 
             client.onConnect( () => {
-                client.onData( (data: Buffer) => {
+                client.onData( (data: Buffer | string) => {
                     assert(data.toString() == "received!");
                     client.close();
                 });
                 client.onClose( () => {
                 });
-                client.sendString("hello");
+                client.send("hello");
             });
         });
     }
@@ -138,9 +138,9 @@ export class Connection {
             server.listen();
 
             server.onConnection( (client: ClientInterface) => {
-                client.onData( (data: Buffer) => {
+                client.onData( (data: Buffer | string) => {
                     assert(data.toString() == "hello");
-                    client.sendString("received!");
+                    client.send("received!");
                 });
                 client.onClose( () => {
                     server.close();
@@ -156,13 +156,13 @@ export class Connection {
             client.connect();
 
             client.onConnect( () => {
-                client.onData( (data: Buffer) => {
+                client.onData( (data: Buffer | string) => {
                     assert(data.toString() == "received!");
                     client.close();
                 });
                 client.onClose( () => {
                 });
-                client.sendString("hello");
+                client.send("hello");
             });
         });
     }
@@ -177,7 +177,7 @@ export class Connection {
             server.listen();
 
             server.onConnection( (client: ClientInterface) => {
-                client.onData( (data: Buffer) => {
+                client.onData( (data: Buffer | string) => {
                     assert(data.toString() == "hello");
                     server.close();
                     resolve();
@@ -191,10 +191,10 @@ export class Connection {
             client.connect();
 
             client.onConnect( () => {
-                client.onData( (data: Buffer) => {
+                client.onData( (data: Buffer | string) => {
                     client.close();
                 });
-                client.sendString("hello");
+                client.send("hello");
             });
         });
     }

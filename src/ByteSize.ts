@@ -1,5 +1,6 @@
 /**
  * This can be used to await X nr of bytes on the client socket.
+ * It is allowed to use text mode sockets, but the data resolve will always be as Buffer.
  *
  */
 import {ClientInterface} from "./types";
@@ -8,10 +9,10 @@ export class ByteSize
 {
     protected client: ClientInterface;
     protected data: Buffer;
-    protected resolve?: Function;
-    protected reject?: Function;
+    protected resolve?: (data: Buffer) => void;
+    protected reject?: (error: Error) => void;
     protected ended: boolean;
-    protected nrBytes?: number;
+    protected nrBytes: number = 0;
     protected timeoutId?: ReturnType<typeof setTimeout>;
 
     constructor(client: ClientInterface) {
@@ -22,6 +23,10 @@ export class ByteSize
         this.ended = false;
     }
 
+    /**
+     * @param nrBytes nr bytes to wait for and resolve. The reminder is "unread" back to socket buffer.
+     *  If set to -1 then wait for any data and resolve all data available at that point.
+     */
     public async read(nrBytes: number, timeout: number = 3000): Promise<Buffer> {
         if (this.ended || this.timeoutId) {
             throw new Error("Cannot reuse a ByteSize");
@@ -33,7 +38,7 @@ export class ByteSize
                 if (this.reject) {
                     const reject = this.reject;
                     this.end();
-                    reject("Timeout");
+                    reject(new Error("Timeout"));
                 }
             }, timeout);
         }
@@ -48,20 +53,31 @@ export class ByteSize
         if (this.reject) {
             const reject = this.reject;
             this.end();
-            reject("Socket closed");
+            reject(new Error("Socket closed"));
         }
     }
 
-    protected onData = (buf: Buffer) => {
+    protected onData = (buf: Buffer | string) => {
         if (this.ended) {
             return;
         }
+
+        if (!Buffer.isBuffer(buf)) {
+            buf = Buffer.from(buf);
+        }
+
         this.data = Buffer.concat([this.data, buf]);
         if (!this.resolve) {
             return;
         }
-        const nrBytes = this.nrBytes ?? 0;
-        if (this.data.length >= nrBytes) {
+
+        if (this.data.length >= this.nrBytes) {
+            if (this.nrBytes < 0 && this.data.length === 0) {
+                return;
+            }
+
+            const nrBytes = this.nrBytes < 0 ? this.data.length : this.nrBytes;
+
             const bite = this.data.slice(0, nrBytes);
             this.data = this.data.slice(nrBytes);
             const resolve = this.resolve;
@@ -82,6 +98,11 @@ export class ByteSize
         this.client.offClose(this.onClose);
         delete this.reject;
         delete this.resolve;
-        this.client.unRead(this.data);
+        if (this.client.isTextMode()) {
+            this.client.unRead(this.data.toString());
+        }
+        else {
+            this.client.unRead(this.data);
+        }
     }
 }

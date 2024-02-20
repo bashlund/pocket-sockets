@@ -66,7 +66,12 @@ export class TCPServer extends Server
     }
 
     protected clientConnected = (socket: net.Socket) => {
-        const client = new TCPClient({bufferData: this.serverOptions.bufferData, port: this.serverOptions.port}, socket);
+        const client = new TCPClient({
+            bufferData: this.serverOptions.bufferData,
+            port: this.serverOptions.port,
+            textMode: this.serverOptions.textMode,
+        }, socket);
+
         this.addClient(client);
     }
 

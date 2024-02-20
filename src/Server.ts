@@ -15,15 +15,15 @@ import {
 export abstract class Server
 {
     protected serverOptions: ServerOptions;
-    protected eventHandlers: {[key: string]: Function[]};
-    protected isClosed: boolean;
+    protected eventHandlers: {[key: string]: ((data: any) => void)[]};
+    protected _isClosed: boolean;
     protected clients: ClientInterface[];
 
     constructor(serverOptions: ServerOptions) {
         this.serverOptions  = serverOptions;
         this.eventHandlers  = {};
         this.clients        = [];
-        this.isClosed       = false;
+        this._isClosed       = false;
     }
 
     /**
@@ -31,6 +31,10 @@ export abstract class Server
      *
      */
     public listen() {
+        if (this.serverOptions.port === 0) {
+            throw new Error("Server socket not allowed to listen to port 0.");
+        }
+
         this.serverListen();
     }
 
@@ -40,7 +44,7 @@ export abstract class Server
      * if set to false then leave accepted client sockets open.
      */
     public close(closeClients: boolean = true) {
-        if (this.isClosed) {
+        if (this._isClosed) {
             return;
         }
         this.serverClose();
@@ -81,6 +85,10 @@ export abstract class Server
         this.on("close", fn);
     }
 
+    public isClosed(): boolean {
+        return this._isClosed;
+    }
+
     /**
      * Create the server socket.
      */
@@ -116,7 +124,7 @@ export abstract class Server
      * Internal close event implementation.
      */
     protected serverClosed = () => {
-        this.isClosed = true;
+        this._isClosed = true;
         this.triggerEvent("close");
     }
 
@@ -149,7 +157,7 @@ export abstract class Server
      * @param {string} event
      * @param {Function} fn
      */
-    public on(event: string, fn: Function) {
+    public on(event: string, fn: (data: any) => void) {
         const fns = this.eventHandlers[event] || [];
         this.eventHandlers[event] = fns;
         fns.push(fn);

@@ -81,7 +81,12 @@ export class WSServer extends Server
     }
 
     protected clientConnected = (socket: WebSocket) => {
-        const client = new WSClient({bufferData: this.serverOptions.bufferData, port: this.serverOptions.port}, socket);
+        const client = new WSClient({
+            bufferData: this.serverOptions.bufferData,
+            port: this.serverOptions.port,
+            textMode: this.serverOptions.textMode,
+        }, socket);
+
         this.addClient(client);
     }
 

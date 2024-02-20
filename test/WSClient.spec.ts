@@ -138,7 +138,7 @@ export class WSClientSocketConnect {
                 "secure": false,
             }, /*@ts-ignore*/ socket);
             assert(client.socketConnect());
-        }, /Socket already created./);
+        }, /Socket already created/);
     }
 
     @Test()
@@ -153,7 +153,7 @@ export class WSClientSocketConnect {
             client.clientOptions = undefined;
             //@ts-ignore: protected method
             assert(client.socketConnect());
-        }, /clientOptions is required to create socket./);
+        }, /clientOptions is required to create socket/);
     }
 }
 
@@ -192,7 +192,8 @@ export class WSClientSocketSend {
             //@ts-ignore: protected data
             client.socket = undefined;
             //@ts-ignore: protected method
-            client.socketSend(Buffer.from("testdata123"));
+            assert.throws( () => client.socketSend(Buffer.from("testdata123")),
+                /Socket not instantiated/ );
         });
     }
 

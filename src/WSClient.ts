@@ -38,13 +38,29 @@ export class WSClient extends Client
 {
     protected socket?: ws;
 
-    constructor(clientOptions: ClientOptions, socket?: ws) {
+    constructor(clientOptions?: ClientOptions, socket?: ws) {
         super(clientOptions);
         this.socket = socket;
 
         if (this.socket) {
+            if (isBrowser) {
+                this.socket.binaryType = "arraybuffer";
+            }
+
             this.socketHook();
         }
+    }
+
+    public getSocket(): ws {
+        if (!this.socket) {
+            throw new Error("Socket not initiated");
+        }
+
+        return this.socket;
+    }
+
+    public isWebSocket(): boolean {
+        return true;
     }
 
     /**
@@ -100,11 +116,11 @@ export class WSClient extends Client
      */
     protected socketConnect() {
         if (this.socket) {
-            throw new Error("Socket already created.");
+            throw new Error("Socket already created");
         }
 
         if (!this.clientOptions) {
-            throw new Error("clientOptions is required to create socket.");
+            throw new Error("clientOptions is required to create socket");
         }
 
         let host = this.clientOptions.host ? this.clientOptions.host : "localhost";
@@ -154,7 +170,7 @@ export class WSClient extends Client
             this.socket.onopen = this.socketConnected;
         }
         else {
-            throw new Error("Could not create socket.");
+            throw new Error("Could not create socket");
         }
     }
 
@@ -171,8 +187,10 @@ export class WSClient extends Client
 
             // Under Browser settings, convert message data from ArrayBuffer to Buffer.
             if (isBrowser) {
-                const bytes = new Uint8Array(data);
-                data = Buffer.from(bytes);
+                if (typeof(data) !== "string") {
+                    const bytes = new Uint8Array(data);
+                    data = Buffer.from(bytes);
+                }
             }
 
             this.socketData(data);
@@ -183,11 +201,28 @@ export class WSClient extends Client
 
     /**
      * Defines how data gets written to the socket.
-     * @param {Buffer} buffer - data to be sent
+     * @param {data} buffer or string - data to be sent
+     *  strings are sent as UTF-8 text, Buffers as binary.
+     * @throws if socket not instantiated.
      */
-    protected socketSend(buffer: Buffer) {
-        if (this.socket) {
-            this.socket.send(buffer, {binary: true, compress: false});
+    protected socketSend(data: Buffer | string) {
+        if (!this.socket) {
+            throw new Error("Socket not instantiated");
+        }
+
+        if (this.isTextMode()) {
+            if (typeof(data) !== "string") {
+                data = data.toString();
+            }
+
+            this.socket.send(data, {binary: false, compress: false});
+        }
+        else {
+            if (!Buffer.isBuffer(data)) {
+                data = Buffer.from(data);
+            }
+
+            this.socket.send(data, {binary: true, compress: false});
         }
     }
 

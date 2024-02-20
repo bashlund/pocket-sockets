@@ -8,4 +8,5 @@ export * from "./Client";
 export * from "./Server";
 export * from "./ByteSize";
 export * from "./SocketFactory";
+export * from "./WrappedClient";
 export * from "./types";

@@ -11,13 +11,21 @@ export class TCPClient extends Client
 {
     protected socket?: net.Socket;
 
-    constructor(clientOptions: ClientOptions, socket?: net.Socket) {
+    constructor(clientOptions?: ClientOptions, socket?: net.Socket) {
         super(clientOptions);
         this.socket = socket;
 
         if (this.socket) {
             this.socketHook();
         }
+    }
+
+    public getSocket(): net.Socket {
+        if (!this.socket) {
+            throw new Error("Socket not initiated.");
+        }
+
+        return this.socket;
     }
 
     /**
@@ -113,11 +121,19 @@ export class TCPClient extends Client
 
     /**
      * Defines how data gets written to the socket.
-     * @param {Buffer} buffer - data to be sent
+     *
+     * @param {data} Buffer or string - data to be sent
      */
-    protected socketSend(buffer: Buffer) {
-        if (this.socket) {
-            this.socket.write(buffer);
+    protected socketSend(data: Buffer | string) {
+        if (!this.socket) {
+            throw new Error("Socket not instantiated");
+        }
+
+        if (!Buffer.isBuffer(data)) {
+            this.socket.write(Buffer.from(data));
+        }
+        else {
+            this.socket.write(data);
         }
     }
 

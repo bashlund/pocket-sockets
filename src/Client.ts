@@ -15,13 +15,35 @@ import {
 export abstract class Client implements ClientInterface
 {
     protected clientOptions?: ClientOptions;
-    protected eventHandlers: {[key: string]: [Function[], (Buffer | undefined)[]]};
-    protected isClosed: boolean;
+    protected eventHandlers: {[key: string]: [((data: any) => void)[], (Buffer | undefined)[]]};
+    protected _isClosed: boolean = false;
 
-    constructor(clientOptions: ClientOptions) {
+    constructor(clientOptions?: ClientOptions) {
         this.clientOptions  = clientOptions;
         this.eventHandlers  = {};
-        this.isClosed = false;
+    }
+
+    /**
+     * This should be called on (wrapped) clients before using.
+     * For regular TCP and WebSocket clients this function does nothing.
+     */
+    public async init() {
+        // Do nothing, but allows wrapping sockets to do something.
+    }
+
+    public getSocket(): any {
+        throw new Error("Function not implemented.");
+    }
+
+    public isWebSocket(): boolean {
+        return false;
+    }
+
+    /**
+     * @returns true if set to text mode, false if binary mode (default).
+     */
+    public isTextMode(): boolean {
+        return this.clientOptions?.textMode ?? false;
     }
 
     /**
@@ -34,26 +56,25 @@ export abstract class Client implements ClientInterface
     }
 
     /**
-     * Send string on socket.
-     *
-     */
-    public sendString(data: string) {
-        this.send(Buffer.from(data));
-    }
-
-    /**
      * Send buffer on socket.
      *
-     * @param {Buffer} data to be sent
+     * @param {data} data to be sent
+     *  For TCP sockets strings are always converted to Buffers before sending.
+     *
+     *  For WebSockets in binary mode strings are converted to Buffers before sending.
+     *
+     *  For WebSockets in binary mode Buffers are sent as they are in binary mode on the WebSocket.
+     *
+     *  For WebSockets in text mode strings are sent as they are in text mode on the WebSocket.
+     *
+     *  For WebSockets in text mode Buffers are converted into strings and sent in text mode
+     *  on the WebSocket.
+     *
      * @throws An error will be thrown when buffer data type is incompatible.
      */
-    public send(data: Buffer) {
-        if (this.isClosed) {
+    public send(data: Buffer | string) {
+        if (this._isClosed) {
             return;
-        }
-
-        if ( !(data instanceof Buffer)) {
-            throw new Error("Data must be of Buffer type.");
         }
 
         this.socketSend(data);
@@ -63,11 +84,15 @@ export abstract class Client implements ClientInterface
      * Close socket.
      */
     public close() {
-        if (this.isClosed) {
+        if (this._isClosed) {
             return;
         }
 
         this.socketClose();
+    }
+
+    public isClosed(): boolean {
+        return this._isClosed;
     }
 
     /**
@@ -92,6 +117,9 @@ export abstract class Client implements ClientInterface
 
     /**
      * User hook for incoming data.
+     *
+     * For sockets in binary mode data in the callback is always Buffer.
+     * For sockets in text mode data in the callback is always string.
      *
      * @param {Function} fn - on data callback. Function is passed a Buffer object.
      */
@@ -173,12 +201,25 @@ export abstract class Client implements ClientInterface
      * Unread data by putting it back into the event queue.
      * @param {Buffer} data
      */
-    public unRead(data: Buffer) {
+    public unRead(data: Buffer | string) {
+        if (this.isTextMode()) {
+            if (typeof(data) !== "string") {
+                throw new Error("unRead expecting string in text mode");
+            }
+        }
+        else {
+            if (!Buffer.isBuffer(data)) {
+                throw new Error("unRead expecting Buffer in binary mode");
+            }
+        }
+
         if (data.length === 0) {
             return;
         }
 
-        const bufferData = this.clientOptions?.bufferData === undefined ? true : this.clientOptions.bufferData;
+        const bufferData = this.clientOptions?.bufferData === undefined ? true :
+            this.clientOptions.bufferData;
+
         this.triggerEvent("data", data, bufferData, true);
     }
 
@@ -202,7 +243,7 @@ export abstract class Client implements ClientInterface
      * Send the given buffer on socket.
      * Socket specific implementation.
      */
-    protected socketSend(buffer: Buffer) {
+    protected socketSend(data: Buffer | string) {  // eslint-disable-line @typescript-eslint/no-unused-vars
         throw new Error("Function not implemented.");
     }
 
@@ -217,7 +258,7 @@ export abstract class Client implements ClientInterface
      * Base close event procedure responsible for triggering the close event.
      */
     protected socketClosed = (hadError: boolean) => {
-        this.isClosed = true;
+        this._isClosed = true;
         this.triggerEvent("close", hadError);
     }
 
@@ -227,12 +268,21 @@ export abstract class Client implements ClientInterface
      * @param {Buffer} data - data buffer.
      *
      */
-    protected socketData = (data: Buffer) => {
-        if ( !(data instanceof Buffer)) {
-            throw new Error("Must read buffer.");
+    protected socketData = (data: Buffer | string) => {
+        if (this.isTextMode()) {
+            if (Buffer.isBuffer(data)) {
+                data = data.toString();
+            }
+        }
+        else {
+            if (typeof(data) === "string") {
+                data = Buffer.from(data);
+            }
         }
 
-        const bufferData = this.clientOptions?.bufferData === undefined ? true : this.clientOptions.bufferData;
+        const bufferData = this.clientOptions?.bufferData === undefined ? true :
+            this.clientOptions.bufferData;
+
         this.triggerEvent("data", data, bufferData);
     }
 
@@ -260,8 +310,8 @@ export abstract class Client implements ClientInterface
      * @param {Function} fn - callback.
      *
      */
-    protected off(event: string, fn: Function) {
-        const [fns, queue] = (this.eventHandlers[event] || [[], []]);
+    protected off(event: string, fn: (data: any) => void) {
+        const [fns] = (this.eventHandlers[event] || [[], []]);
         const index = fns.indexOf(fn);
         if (index > -1) {
             fns.splice(index, 1);
@@ -275,7 +325,7 @@ export abstract class Client implements ClientInterface
      * @param {Function} fn - callback.
      *
      */
-    protected on(event: string, fn: Function) {
+    protected on(event: string, fn: (data: any) => void) {
         const tuple = (this.eventHandlers[event] || [[], []]);
         this.eventHandlers[event] = tuple;
         const [fns, queue] = tuple;
@@ -314,7 +364,7 @@ export abstract class Client implements ClientInterface
             }
         }
         else {
-            fns.forEach( (fn: Function) => {
+            fns.forEach( (fn) => {
                 fn(data);
             });
         }

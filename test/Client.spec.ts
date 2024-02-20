@@ -22,7 +22,7 @@ export class ClientConstructor {
             assert(client.clientOptions!.port == 99);
 
             //@ts-ignore: protected data
-            assert(client.isClosed == false);
+            assert(client._isClosed == false);
             //@ts-ignore: protected data
             assert(Object.keys(client.eventHandlers).length == 0);
 
@@ -138,7 +138,7 @@ export class ClientSend {
                 "port": 99,
             });
             //@ts-ignore: protected data
-            client.isClosed = true;
+            client._isClosed = true;
             client.send(Buffer.from("testdata"));
             assert(flag == false);
         });
@@ -168,7 +168,7 @@ export class ClientSendString {
                 "host": "host.com",
                 "port": 99,
             });
-            client.sendString("testdata");
+            client.send("testdata");
             assert(flag == true);
         });
     }
@@ -197,7 +197,7 @@ export class ClientClose {
                 "port": 99,
             });
             //@ts-ignore: protected data
-            client.isClosed = true;
+            client._isClosed = true;
             client.close();
             assert(flag == false);
         });
@@ -543,7 +543,7 @@ export class ClientCloseInner {
             socketConnect() {
             }
             socketClose() {
-                this.isClosed = true;
+                this._isClosed = true;
             }
             socketHook() {
             }
@@ -556,10 +556,10 @@ export class ClientCloseInner {
             });
             assert(flag == false);
             //@ts-ignore: protected data
-            assert(client.isClosed == false);
+            assert(client._isClosed == false);
             client.close();
             //@ts-ignore: protected data
-            assert(client.isClosed == true);
+            assert(client._isClosed == true);
         });
     }
 }
@@ -709,11 +709,11 @@ export class ClientSocketClosed {
             });
             assert(flagOnEvent == false);
             //@ts-ignore: protected data
-            assert(client.isClosed == false);
+            assert(client._isClosed == false);
             //@ts-ignore: protected method
             client.socketClosed(true);
             //@ts-ignore: protected data
-            assert(client.isClosed == true);
+            assert(client._isClosed == true);
             assert(flagOnEvent == true);
         });
     }
