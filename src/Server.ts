@@ -3,7 +3,7 @@ import {
     ServerOptions,
     SocketErrorCallback,
     SocketCloseCallback,
-    SocketAcceptedCallback,
+    SocketAcceptCallback,
 } from "./types";
 
 /**
@@ -61,7 +61,7 @@ export abstract class Server
      *
      * @param {Function} fn callback
      */
-    public onConnection(fn: SocketAcceptedCallback) {
+    public onConnection(fn: SocketAcceptCallback) {
         this.on("connection", fn);
     }
 
@@ -117,7 +117,9 @@ export abstract class Server
      * @param {Error} err
      */
     protected serverError = (message: string) => {
-        this.triggerEvent("error", message);
+        const errorEvent: Parameters<SocketErrorCallback> = [message];
+
+        this.triggerEvent("error", ...errorEvent);
     }
 
     /**
@@ -136,7 +138,10 @@ export abstract class Server
     protected addClient(client: ClientInterface) {
         this.clients.push(client);
         client.onClose( () => { this.removeClient(client) } );
-        this.triggerEvent("connection", client);
+
+        const socketAcceptedEvent: Parameters<SocketAcceptCallback> = [client];
+
+        this.triggerEvent("connection", ...socketAcceptedEvent);
     }
 
     /**

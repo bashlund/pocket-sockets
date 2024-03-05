@@ -1,4 +1,4 @@
-import { TestSuite, Test } from "testyts";
+import { TestSuite, Test, FTest } from "testyts";
 import {SocketFactory} from "../src/SocketFactory";
 
 import {
@@ -477,12 +477,15 @@ export class SocketFactoryConnectClient {
                 initClientSocketCalled = true;
             };
             //@ts-ignore
-            socketFactory.triggerEvent = function(name, args) {
+            socketFactory.triggerEvent = function(name, ...args: any[]) {
                 assert(name == "CLIENT_INIT_ERROR" || name == "ERROR");
-                if(args.e && args.e.error) {
-                    assert(args.e.error.message == "test");
-                } else {
-                    assert(args.error.message == "test");
+
+                if (name == "CLIENT_INIT_ERROR") {
+                    assert(args[0].message == "test");
+                }
+                else {
+                    assert(args[0] == "CLIENT_INIT_ERROR");
+                    assert(args[1].message == "test");
                 }
             };
 
@@ -672,12 +675,15 @@ export class SocketFactoryInitClientSocket {
             });
 
             //@ts-ignore
-            socketFactory.triggerEvent = function(name, args) {
+            socketFactory.triggerEvent = function(name, ...args: any[]) {
                 assert(name == "CLIENT_CONNECT_ERROR" || name == "ERROR");
-                if(args.e && args.e.error) {
-                    assert(args.e.error.message == "test");
-                } else {
-                    assert(args.error.message == "test");
+
+                if (name == "CLIENT_CONNECT_ERROR") {
+                    assert(args[0].message == "test");
+                }
+                else {
+                    assert(args[0] == "CLIENT_CONNECT_ERROR");
+                    assert(args[1].message == "test");
                 }
             };
 
@@ -726,12 +732,15 @@ export class SocketFactoryInitClientSocket {
             });
 
             //@ts-ignore
-            socketFactory.triggerEvent = function(name, args) {
+            socketFactory.triggerEvent = function(name, ...args: any[]) {
                 assert(name == "CLIENT_CONNECT_ERROR" || name == "ERROR");
-                if(args.e && args.e.error) {
-                    assert(args.e.error.message == "test");
-                } else {
-                    assert(args.error.message == "test");
+
+                if (name == "CLIENT_CONNECT_ERROR") {
+                    assert(args[0].message == "test");
+                }
+                else {
+                    assert(args[0] == "CLIENT_CONNECT_ERROR");
+                    assert(args[1].message == "test");
                 }
             };
 
@@ -780,12 +789,15 @@ export class SocketFactoryInitClientSocket {
             });
 
             //@ts-ignore
-            socketFactory.triggerEvent = function(name, args) {
+            socketFactory.triggerEvent = function(name, ...args: any[]) {
                 assert(name == "CLIENT_CONNECT_ERROR" || name == "ERROR");
-                if(args.e && args.e.error) {
-                    assert(args.e.error.message == "test");
-                } else {
-                    assert(args.error.message == "test");
+
+                if (name == "CLIENT_CONNECT_ERROR") {
+                    assert(args[0].message == "test");
+                }
+                else {
+                    assert(args[0] == "CLIENT_CONNECT_ERROR");
+                    assert(args[1].message == "test");
                 }
             };
 
@@ -798,9 +810,16 @@ export class SocketFactoryInitClientSocket {
                 assert(host == "host.com");
             };
             //@ts-ignore
-            socketFactory.triggerEvent = function(name, args) {
+            socketFactory.triggerEvent = function(name, ...args: any[]) {
                 assert(name == "ERROR" || name == "CONNECT");
-                assert(args.isServer == false);
+
+                if (name === "CONNECT") {
+                    assert(args[1] == false);
+                }
+                else {
+                    assert(args[0] == "CONNECT");
+                    assert(args[1] == false);
+                }
             };
 
             let onErrorCalled = false;
@@ -853,12 +872,15 @@ export class SocketFactoryInitClientSocket {
             });
 
             //@ts-ignore
-            socketFactory.triggerEvent = function(name, args) {
+            socketFactory.triggerEvent = function(name, ...args: any[]) {
                 assert(name == "CLIENT_CONNECT_ERROR" || name == "ERROR");
-                if(args.e && args.e.error) {
-                    assert(args.e.error.message == "test");
-                } else {
-                    assert(args.error.message == "test");
+
+                if (name == "CLIENT_CONNECT_ERROR") {
+                    assert(args[0].message == "test");
+                }
+                else {
+                    assert(args[0] == "CLIENT_CONNECT_ERROR");
+                    assert(args[1].message == "test");
                 }
             };
 
@@ -871,9 +893,16 @@ export class SocketFactoryInitClientSocket {
                 assert(host == "host.com");
             };
             //@ts-ignore
-            socketFactory.triggerEvent = function(name, args) {
+            socketFactory.triggerEvent = function(name, ...args: any[]) {
                 assert(name == "ERROR" || name == "CONNECT");
-                assert(args.isServer == false);
+
+                if (name == "CONNECT") {
+                    assert(args[1] == false);
+                }
+                else {
+                    assert(args[0] == "CONNECT");
+                    assert(args[1] == false);
+                }
             };
 
             let onErrorCalled = false;
@@ -1126,12 +1155,15 @@ export class SocketFactoryOpenServer {
             };
 
             //@ts-ignore
-            socketFactory.triggerEvent = function(name, args) {
+            socketFactory.triggerEvent = function(name, ...args: any[]) {
                 assert(name == "SERVER_INIT_ERROR" || name == "ERROR");
-                if(args.e && args.e.error) {
-                    assert(args.e.error.message == "test");
-                } else {
-                    assert(args.error.message == "test");
+
+                if (name == "SERVER_INIT_ERROR") {
+                    assert(args[0].message == "test");
+                }
+                else {
+                    assert(args[0] == "SERVER_INIT_ERROR");
+                    assert(args[1].message == "test");
                 }
             };
 
@@ -1980,7 +2012,7 @@ export class SocketFactoryOnError {
             socketFactory.hookEvent = function(name, callback) {
                 assert(name == "ERROR");
             };
-            socketFactory.onError(()=>{});
+            socketFactory.onSocketFactoryError(()=>{});
         });
     }
 }
@@ -2202,7 +2234,7 @@ export class SocketFactoryOnClose {
 }
 
 @TestSuite()
-export class SocketFactoryOnRefusedClientConnection {
+export class SocketFactoryOnRefuseClientConnection {
     @Test()
     public successful_call() {
         assert.doesNotThrow(() => {
@@ -2230,9 +2262,9 @@ export class SocketFactoryOnRefusedClientConnection {
 
             //@ts-ignore
             socketFactory.hookEvent = function(name, callback) {
-                assert(name == "CLIENT_REFUSE");
+                assert(name == "CLIENT_IP_REFUSE");
             };
-            socketFactory.onRefusedClientConnection(()=>{});
+            socketFactory.onClientIPRefuse(()=>{});
         });
     }
 }
@@ -2279,7 +2311,7 @@ export class SocketFactoryHookUnhookTriggerEvent {
             //@ts-ignore
             assert(callbackCalled == false);
             //@ts-ignore
-            socketFactory.triggerEvent("testtype", "test argument");
+            socketFactory.triggerEvent("testtype", ["test argument"]);
             //@ts-ignore
             assert(callbackCalled == true);
 

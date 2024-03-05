@@ -119,6 +119,10 @@ export class TCPClient extends Client
         this.socket.on("close", this.socketClosed);         // Socket closed
     }
 
+    protected unhookError() {
+        this.socket?.off("error", this.error);
+    }
+
     /**
      * Defines how data gets written to the socket.
      *
@@ -147,6 +151,6 @@ export class TCPClient extends Client
     }
 
     protected error = (error: Error) => {
-        this.socketError(error.message);
+        this.socketError(error.message || "TCP socket could not connect");
     };
 }

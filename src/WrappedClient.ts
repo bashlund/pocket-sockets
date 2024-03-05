@@ -12,8 +12,6 @@ import {
  * specific methods can be overriden to transform incoming and outgoint socket data.
  */
 export class WrappedClient implements WrappedClientInterface {
-    protected handlers: {[name: string]: ((args?: any) => void)[]} = {};
-
     constructor(protected client: ClientInterface) {}
 
     public getClient(): ClientInterface {
@@ -101,23 +99,5 @@ export class WrappedClient implements WrappedClientInterface {
 
     public getLocalPort(): number | undefined {
         return this.client.getLocalPort();
-    }
-
-    protected hookEvent(type: string, callback: (args?: any) => void) {
-        const cbs = this.handlers[type] || [];
-        this.handlers[type] = cbs;
-        cbs.push(callback);
-    }
-
-    protected unhookEvent(type: string, callback: (args?: any) => void) {
-        const cbs = (this.handlers[type] || []).filter( (cb: (args?: any) => void) => callback !== cb );
-        this.handlers[type] = cbs;
-    }
-
-    protected triggerEvent(type: string, ...args: any) {
-        const cbs = this.handlers[type] || [];
-        cbs.forEach( (callback) => {
-            callback(...args);
-        });
     }
 }

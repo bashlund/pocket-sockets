@@ -199,6 +199,12 @@ export class WSClient extends Client
         this.socket.onclose = (closeEvent) => this.socketClosed(closeEvent && closeEvent.code === 1000);         // Socket closed
     }
 
+    protected unhookError() {
+        if (this.socket) {
+            this.socket.onerror = null;
+        }
+    }
+
     /**
      * Defines how data gets written to the socket.
      * @param {data} buffer or string - data to be sent
@@ -236,6 +242,6 @@ export class WSClient extends Client
     }
 
     protected error = (error: ws.ErrorEvent) => {
-        this.socketError(error.message || "Unknown error message");
+        this.socketError(error.message || error.error || "WebSocket could not connect");
     };
 }
