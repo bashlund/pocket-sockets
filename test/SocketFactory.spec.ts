@@ -1,4 +1,4 @@
-import { TestSuite, Test, FTest } from "testyts";
+import { TestSuite, Test } from "testyts";
 import {SocketFactory} from "../src/SocketFactory";
 
 import {
