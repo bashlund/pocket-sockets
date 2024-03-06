@@ -217,10 +217,12 @@ export abstract class Client implements ClientInterface
             return;
         }
 
-        const bufferData = this.clientOptions?.bufferData === undefined ? true :
+        const bufferIncomingData = this.clientOptions?.bufferData === undefined ? true :
             this.clientOptions.bufferData;
 
-        this.triggerEvent("data", data, bufferData, true);
+        const dataEvent: Parameters<SocketDataCallback> = [data];
+
+        this.triggerEvent("data", ...dataEvent, bufferIncomingData, true);
     }
 
     /**
@@ -259,7 +261,10 @@ export abstract class Client implements ClientInterface
      */
     protected socketClosed = (hadError: boolean) => {
         this._isClosed = true;
-        this.triggerEvent("close", hadError);
+
+        const closeEvent: Parameters<SocketCloseCallback> = [hadError];
+
+        this.triggerEvent("close", ...closeEvent);
     }
 
     /**
@@ -280,17 +285,29 @@ export abstract class Client implements ClientInterface
             }
         }
 
-        const bufferData = this.clientOptions?.bufferData === undefined ? true :
+        const bufferIncomingData = this.clientOptions?.bufferData === undefined ? true :
             this.clientOptions.bufferData;
 
-        this.triggerEvent("data", data, bufferData);
+        const dataEvent: Parameters<SocketDataCallback> = [data];
+
+        this.triggerEvent("data", ...dataEvent, bufferIncomingData);
     }
 
     /**
      * Base connect event procedure responsible for triggering the connect event.
      */
     protected socketConnected = () => {
+        this.unhookError();
+
         this.triggerEvent("connect");
+    }
+
+    /**
+     * The error handler should be unhooked after connection to not confuse
+     * abrupt close with connect error.
+     */
+    protected unhookError() {
+        throw new Error("Function not implemented");
     }
 
     /**
@@ -300,7 +317,9 @@ export abstract class Client implements ClientInterface
      *
      */
     protected socketError = (message: string) => {
-        this.triggerEvent("error", message);
+        const errorEvent: Parameters<SocketErrorCallback> = [message];
+
+        this.triggerEvent("error", ...errorEvent);
     }
 
     /**
@@ -345,7 +364,8 @@ export abstract class Client implements ClientInterface
      * @param {string} event - event name.
      * @param {Buffer} [data] - event data.
      * @param {boolean} [doBuffer] - buffers up event data.
-     * @param {boolean} [invertOrder] - used for "unreading" an event and puts it first in the queue (if doBuffer is true)
+     * @param {boolean} [invertOrder] - used for "unreading" an event and puts it first in the
+     * queue (if doBuffer is true)
      *
      */
     protected triggerEvent(event: string, data?: any, doBuffer = false, invertOrder = false) {

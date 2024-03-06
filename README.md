@@ -20,7 +20,7 @@ The overall interface for _pocket-sockets_ _WebSocket_ and _TCP_ sockets **are i
 ## Example
 For a quick glimpse of what it looks like to set up a server that receives a string from clients, then replies back and closes the connection afterwards, follow the example below:
 ```typescript
-import {WSServer, WSClient, Client} from "pocket-sockets";
+import {WSServer, WSClient, ClientInterface} from "pocket-sockets";
 
 const server = new WSServer({
     host: "localhost",
@@ -28,9 +28,9 @@ const server = new WSServer({
 });
 server.listen();
 
-server.onConnection( (client: Client) => {
-    client.onData( (data: Buffer) => {
-        client.sendString("This is server: received!");
+server.onConnection( (client: ClientInterface) => {
+    client.onData( (data: Buffer | string) => {
+        client.send("This is server: received!");
     });
     client.onClose( () => {
         server.close();
@@ -44,10 +44,10 @@ const client = new WSClient({
 client.connect();
 
 client.onConnect( () => {
-    client.onData( (data: Buffer) => {
+    client.onData( (data: Buffer | string) => {
         client.close();
     });
-    client.sendString("This is client: hello");
+    client.send("This is client: hello");
 });
 ```
 

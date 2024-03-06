@@ -253,8 +253,8 @@ export class WSClientError {
             });
             let flag = false;
             //@ts-ignore: protected method
-            client.socketError = function(buffer: Buffer) {
-                assert(buffer.toString() == "test error");
+            client.socketError = function(msg: string) {
+                assert(msg == "test error");
                 flag = true;
             };
             assert(flag == false);
@@ -275,8 +275,8 @@ export class WSClientError {
             });
             let flag = false;
             //@ts-ignore: protected method
-            client.socketError = function(buffer: Buffer) {
-                assert(buffer.toString() == "Unknown error message");
+            client.socketError = function(msg: string) {
+                assert(msg == "WebSocket could not connect");
                 flag = true;
             };
             //@ts-ignore: ignore missing input check
@@ -295,7 +295,7 @@ export class WSClientError {
             });
             let flag = false;
             //@ts-ignore: protected method
-            client.socketError = function(buffer: Buffer) {
+            client.socketError = function(msg: string) {
                 flag = true;
             };
             //@ts-ignore: ignore missing input check

@@ -54,6 +54,8 @@ export class ClientConnect {
             }
             socketHook() {
             }
+            unhookError() {
+            }
         }
 
         assert.doesNotThrow(() => {
@@ -75,6 +77,8 @@ export class ClientConnect {
             }
             socketHook() {
                 flag = true;
+            }
+            unhookError() {
             }
         }
 
@@ -105,6 +109,8 @@ export class ClientSend {
             }
             socketHook() {
             }
+            unhookError() {
+            }
         }
 
         assert.doesNotThrow(() => {
@@ -128,6 +134,8 @@ export class ClientSend {
             socketConnect() {
             }
             socketHook() {
+            }
+            unhookError() {
             }
         }
 
@@ -160,6 +168,8 @@ export class ClientSendString {
             }
             socketHook() {
             }
+            unhookError() {
+            }
         }
 
         assert.doesNotThrow(() => {
@@ -184,6 +194,8 @@ export class ClientClose {
             socketConnect() {
             }
             socketHook() {
+            }
+            unhookError() {
             }
             _socketClose() {
                 flag = true;
@@ -212,6 +224,8 @@ export class ClientClose {
             }
             socketHook() {
             }
+            unhookError() {
+            }
             socketClose() {
                 flag = true;
             }
@@ -235,6 +249,8 @@ export class ClientClose {
             socketConnect() {
             }
             socketHook() {
+            }
+            unhookError() {
             }
             socketClose() {
                 flag = true;
@@ -265,6 +281,8 @@ export class ClientOnError {
             }
             socketHook() {
             }
+            unhookError() {
+            }
             on(evt: string, fn: Function) {
                 assert(evt == "error");
                 assert(fn instanceof Function);
@@ -294,6 +312,8 @@ export class ClientOffError {
             }
             socketHook() {
             }
+            unhookError() {
+            }
             on(evt: string, fn: Function) {
                 assert(evt == "error");
                 assert(fn instanceof Function);
@@ -322,6 +342,8 @@ export class ClientOnData {
             }
             socketHook() {
             }
+            unhookError() {
+            }
             on(evt: string, fn: Function) {
                 assert(evt == "data");
                 assert(fn instanceof Function);
@@ -349,6 +371,8 @@ export class ClientOffData {
                 socketConnect() {
                 }
                 socketHook() {
+                }
+                unhookError() {
                 }
                 on(evt: string, fn: Function) {
                     assert(evt == "data");
@@ -379,6 +403,8 @@ export class ClientOnConnect {
             }
             socketHook() {
             }
+            unhookError() {
+            }
             on(evt: string, fn: Function) {
                 assert(evt == "connect");
                 assert(fn instanceof Function);
@@ -406,6 +432,8 @@ export class ClientOffConnect {
             socketConnect() {
             }
             socketHook() {
+            }
+            unhookError() {
             }
             on(evt: string, fn: Function) {
                 assert(evt == "connect");
@@ -435,6 +463,8 @@ export class ClientOnClose {
             }
             socketHook() {
             }
+            unhookError() {
+            }
             on(evt: string, fn: Function) {
                 assert(evt == "close");
                 assert(fn instanceof Function);
@@ -463,6 +493,8 @@ export class ClientOffClose {
             }
             socketHook() {
             }
+            unhookError() {
+            }
             on(evt: string, fn: Function) {
                 assert(evt == "close");
                 assert(fn instanceof Function);
@@ -489,6 +521,8 @@ export class ClientOn {
             }
             socketHook() {
             }
+            unhookError() {
+            }
         }
 
         assert.doesNotThrow(() => {
@@ -514,6 +548,8 @@ export class ClientOff {
             socketConnect() {
             }
             socketHook() {
+            }
+            unhookError() {
             }
         }
 
@@ -547,6 +583,8 @@ export class ClientCloseInner {
             }
             socketHook() {
             }
+            unhookError() {
+            }
         }
 
         assert.doesNotThrow(() => {
@@ -574,6 +612,8 @@ export class ClientData {
             socketConnect() {
             }
             socketHook() {
+            }
+            unhookError() {
             }
             triggerEvent(evt: string) {
                 assert(evt == "data");
@@ -605,6 +645,8 @@ export class ClientConnectInner {
             }
             socketHook() {
             }
+            unhookError() {
+            }
             triggerEvent(evt: string) {
                 assert(evt == "connect");
                 flag = true;
@@ -631,6 +673,8 @@ export class ClientError {
             socketConnect() {
             }
             socketHook() {
+            }
+            unhookError() {
             }
             triggerEvent(evt: string) {
                 assert(evt == "error");
@@ -695,6 +739,8 @@ export class ClientSocketClosed {
             }
             socketHook() {
             }
+            unhookError() {
+            }
             triggerEvent(evt: string, data: boolean) {
                 flagOnEvent = true;
                 assert(evt == "close");
@@ -730,6 +776,8 @@ export class ClientSocketConnected {
             }
             socketHook() {
             }
+            unhookError() {
+            }
             triggerEvent(evt: string, data: any) {
                 flagOnEvent = true;
                 assert(evt == "connect");
@@ -761,6 +809,8 @@ export class ClientSocketError {
             }
             socketHook() {
             }
+            unhookError() {
+            }
             triggerEvent(evt: string, data: Buffer) {
                 flagOnEvent = true;
                 assert(evt == "error");
@@ -790,6 +840,8 @@ export class ClientTriggerEvent {
             socketConnect() {
             }
             socketHook() {
+            }
+            unhookError() {
             }
         }
 

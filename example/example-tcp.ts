@@ -15,22 +15,24 @@
 //   Client: closed
 //
 
-import {TCPServer, TCPClient, Client} from "../index";
+import {TCPServer, TCPClient, ClientInterface} from "../index";
 
 console.log("pocket-sockets: TCP example");
 const serverOptions = {
     host: "localhost",
-    port: 8181
+    port: 8181,
+    // If wanting to send/recieve in text-mode set textMode to true.
+    //textMode: true,
 };
 const server = new TCPServer(serverOptions);
 server.listen();
 console.log("Server: listening...");
 
-server.onConnection( (client: Client) => {
+server.onConnection( (client: ClientInterface) => {
     console.log("Server: socket accepted");
-    client.onData( (data: Buffer) => {
+    client.onData( (data: Buffer | string) => {
         console.log("Server: incoming client data", data);
-        client.sendString("This is server: received!");
+        client.send("This is server: received!");
     });
     client.onClose( () => {
         console.log("Server: client connection closed");
@@ -40,7 +42,9 @@ server.onConnection( (client: Client) => {
 
 const clientOptions = {
     host: "localhost",
-    port: 8181
+    port: 8181,
+    // If wanting to send/recieve in text-mode set textMode to true.
+    //textMode: true,
 };
 const client = new TCPClient(clientOptions);
 client.connect();
@@ -48,12 +52,12 @@ console.log("Client: connecting...");
 
 client.onConnect( () => {
     console.log("Client: connected");
-    client.onData( (data: Buffer) => {
+    client.onData( (data: Buffer | string) => {
         console.log("Client: incoming server data", data);
         client.close();
     });
     client.onClose( () => {
         console.log("Client: closed");
     });
-    client.sendString("This is client: hello");
+    client.send("This is client: hello");
 });
