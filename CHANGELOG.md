@@ -1,5 +1,9 @@
 # CHANGELOG: pocket-sockets
 
+## [4.0.0] - 20240307
+Improve event handling.  
+Bug fix.  
+
 ## [3.0.0] - 20240220
 Add text-mode options to socket.  
 Add WrappedClient to allow for more complex clients.  
