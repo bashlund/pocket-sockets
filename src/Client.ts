@@ -15,12 +15,18 @@ import {
 export abstract class Client implements ClientInterface
 {
     protected clientOptions?: ClientOptions;
-    protected eventHandlers: {[key: string]: [((data: any) => void)[], (Buffer | undefined)[]]};
+    protected eventHandlers: {[key: string]: ((data: any) => void)[]} = {
+        data: [],
+        error: [],
+        connect: [],
+        close: [],
+    };
     protected _isClosed: boolean = false;
+    protected bufferedData: Array<(Buffer | string)> = [];
+    protected unreadData: Array<(Buffer | string)> = [];
 
     constructor(clientOptions?: ClientOptions) {
         this.clientOptions  = clientOptions;
-        this.eventHandlers  = {};
     }
 
     /**
@@ -199,6 +205,8 @@ export abstract class Client implements ClientInterface
 
     /**
      * Unread data by putting it back into the event queue.
+     * This will not trigger an onData event but the data will be
+     * buffered until the next onData event is triggered.
      * @param {Buffer} data
      */
     public unRead(data: Buffer | string) {
@@ -217,12 +225,7 @@ export abstract class Client implements ClientInterface
             return;
         }
 
-        const bufferIncomingData = this.clientOptions?.bufferData === undefined ? true :
-            this.clientOptions.bufferData;
-
-        const dataEvent: Parameters<SocketDataCallback> = [data];
-
-        this.triggerEvent("data", ...dataEvent, bufferIncomingData, true);
+        this.unreadData.push(data);
     }
 
     /**
@@ -285,12 +288,42 @@ export abstract class Client implements ClientInterface
             }
         }
 
-        const bufferIncomingData = this.clientOptions?.bufferData === undefined ? true :
-            this.clientOptions.bufferData;
+        const fns = this.eventHandlers["data"];
 
-        const dataEvent: Parameters<SocketDataCallback> = [data];
+        if (fns.length > 0) {
+            let data2: Buffer | string | undefined = undefined;
+            if (this.unreadData.length > 0) {
+                if (Buffer.isBuffer(data)) {
+                    data2 = Buffer.concat((this.unreadData as Buffer[]));
+                }
+                else {
+                    data2 = (this.unreadData as string[]).join("");
+                }
+                this.unreadData.length = 0;
+            }
 
-        this.triggerEvent("data", ...dataEvent, bufferIncomingData);
+            this.bufferedData.push(data);
+
+            if (Buffer.isBuffer(data)) {
+                data2 = Buffer.concat([(data2 ?? Buffer.alloc(0)) as Buffer, ...(this.bufferedData as Buffer[])]);
+            }
+            else {
+                data2 = (data2 ?? "") + (this.bufferedData as string[]).join("");
+            }
+            this.bufferedData.length = 0;
+
+            fns.forEach( (fn) => {
+                fn(data2);
+            });
+        }
+        else {
+            const bufferIncomingData = this.clientOptions?.bufferData === undefined ? true :
+                this.clientOptions.bufferData;
+
+            if (bufferIncomingData) {
+                this.bufferedData.push(data);
+            }
+        }
     }
 
     /**
@@ -330,9 +363,9 @@ export abstract class Client implements ClientInterface
      *
      */
     protected off(event: string, fn: (data: any) => void) {
-        const [fns] = (this.eventHandlers[event] || [[], []]);
-        const index = fns.indexOf(fn);
-        if (index > -1) {
+        const fns = this.eventHandlers[event];
+        const index = fns?.indexOf(fn);
+        if (index !== undefined && index > -1) {
             fns.splice(index, 1);
         }
     }
@@ -345,48 +378,24 @@ export abstract class Client implements ClientInterface
      *
      */
     protected on(event: string, fn: (data: any) => void) {
-        const tuple = (this.eventHandlers[event] || [[], []]);
-        this.eventHandlers[event] = tuple;
-        const [fns, queue] = tuple;
-        if (fns.length === 0) {
-            // Send buffered up events.
-            queue.forEach( (event: any) => {
-                fn(event);
-            });
-            queue.length = 0;
+        this.eventHandlers[event]?.push(fn);
+
+        if (event === "data") {
+            if (this.bufferedData.length > 0 || this.unreadData.length > 0) {
+                this.socketData(Buffer.alloc(0));
+            }
         }
-        fns.push(fn);
     }
 
     /**
      * Trigger event calls the appropriate handler based on the event name.
      *
      * @param {string} event - event name.
-     * @param {Buffer} [data] - event data.
-     * @param {boolean} [doBuffer] - buffers up event data.
-     * @param {boolean} [invertOrder] - used for "unreading" an event and puts it first in the
-     * queue (if doBuffer is true)
-     *
+     * @param {any} data - event data passed on to event handler.
      */
-    protected triggerEvent(event: string, data?: any, doBuffer = false, invertOrder = false) {
-        const tuple = (this.eventHandlers[event] || [[], []]);
-        this.eventHandlers[event] = tuple;
-        const [fns, queue] = tuple;
-        if (fns.length === 0) {
-            if (doBuffer) {
-                // Buffer up the event
-                if (invertOrder) {
-                    queue.unshift(data);
-                }
-                else {
-                    queue.push(data);
-                }
-            }
-        }
-        else {
-            fns.forEach( (fn) => {
-                fn(data);
-            });
-        }
+    protected triggerEvent(event: string, data?: any) {
+        this.eventHandlers[event]?.forEach( (fn) => {
+            fn(data);
+        });
     }
 }

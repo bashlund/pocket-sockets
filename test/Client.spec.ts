@@ -24,7 +24,7 @@ export class ClientConstructor {
             //@ts-ignore: protected data
             assert(client._isClosed == false);
             //@ts-ignore: protected data
-            assert(Object.keys(client.eventHandlers).length == 0);
+            assert(Object.keys(client.eventHandlers).length == 4);
 
             //@ts-ignore: protected data
             assert(client.clientOptions!.bufferData == undefined);
@@ -531,11 +531,11 @@ export class ClientOn {
                 "port": 99,
             });
             //@ts-ignore: protected data
-            assert(!client.eventHandlers["myevent"]);
+            assert(client.eventHandlers["error"].length === 0);
             //@ts-ignore
-            client.on("myevent", function(){});
+            client.on("error", function(){});
             //@ts-ignore: protected data
-            assert(client.eventHandlers["myevent"]);
+            assert(client.eventHandlers["error"].length === 1);
         });
     }
 }
@@ -560,11 +560,11 @@ export class ClientOff {
             });
             const fn = function(){};
             //@ts-ignore
-            client.on("myevent", fn);
+            client.on("error", fn);
             //@ts-ignore: protected data
-            assert(client.eventHandlers["myevent"]);
+            assert(client.eventHandlers["error"].length === 1);
             //@ts-ignore
-            client.off("myevent", fn);
+            client.off("error", fn);
         });
     }
 }
@@ -629,7 +629,7 @@ export class ClientData {
             assert(flag == false);
             //@ts-ignore
             client.socketData(Buffer.from("data"));
-            assert(flag == true);
+            assert(flag == false);
         });
     }
 }
@@ -856,9 +856,9 @@ export class ClientTriggerEvent {
                 flag = true;
             };
             //@ts-ignore: private method
-            client.on("testevent", fn);
+            client.on("error", fn);
             //@ts-ignore: protected method
-            client.triggerEvent("testevent", fn);
+            client.triggerEvent("error", fn);
             //@ts-ignore: data is changed inside trigger event callback
             assert(flag == true);
         });
