@@ -1,5 +1,9 @@
 # CHANGELOG: pocket-sockets
 
+## [4.1.0] - 20250807
+Simplify event handling..
+Improve data unread functionality..
+
 ## [4.0.0] - 20240307
 Improve event handling.  
 Bug fix.  
